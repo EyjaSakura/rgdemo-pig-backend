@@ -1,0 +1,21 @@
+server:
+  port: 4005 # 专属端口
+
+spring:
+  application:
+    name: eyja-homework-biz # 服务名
+  profiles:
+    active: dev # 指定开发环境
+  cloud:
+    nacos:
+      username: ${NACOS_USERNAME:nacos}
+      password: ${NACOS_PASSWORD:nacos}
+      discovery:
+        server-addr: ${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}
+      config:
+        server-addr: ${spring.cloud.nacos.discovery.server-addr}
+  config:
+    import:
+      # Spring Boot 新特性，直接在 application.yml 里拉取 Nacos 配置
+      - optional:nacos:application-${spring.profiles.active}.yml
+      - optional:nacos:${spring.application.name}-${spring.profiles.active}.yml
