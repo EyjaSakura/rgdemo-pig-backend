@@ -22,10 +22,7 @@ package com.pig4cloud.pig.admin.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.pig4cloud.pig.admin.api.dto.RegisterUserDTO;
-import com.pig4cloud.pig.admin.api.dto.ResetPwdDTO;
-import com.pig4cloud.pig.admin.api.dto.UserDTO;
-import com.pig4cloud.pig.admin.api.dto.UserInfo;
+import com.pig4cloud.pig.admin.api.dto.*;
 import com.pig4cloud.pig.admin.api.entity.SysUser;
 import com.pig4cloud.pig.admin.api.vo.UserCenterVO;
 import com.pig4cloud.pig.admin.api.vo.UserExcelVO;
@@ -149,4 +146,18 @@ public interface SysUserService extends IService<SysUser> {
 	// 非框架原有
 	// 获取个人中心信息
 	UserCenterVO getUserCenterInfo();
+
+	// 非框架原有
+	// Excel批量导入学生
+	// @param excelVOList 学生 Excel 数据列表
+	// @param bindingResult 数据校验结果
+	// @return 导入结果
+	R importStudents(List<StudentExcelDTO> excelVOList, BindingResult bindingResult);
+
+	// 非框架原有
+	// Excel批量导入教师
+	// @param excelVOList 教师 Excel 数据列表
+	// @param bindingResult 数据校验结果
+	// @return 导入结果
+	R importTeachers(List<TeacherExcelDTO> excelVOList, BindingResult bindingResult);
 }

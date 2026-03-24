@@ -106,4 +106,10 @@ public class SysDept extends Model<SysDept> {
 	@TableField(fill = FieldFill.INSERT)
 	private String delFlag;
 
+	/**
+	 * 层级类型（非框架原有）
+	 */
+	@Schema(description = "层级类型")
+	private String deptCategory;
+
 }

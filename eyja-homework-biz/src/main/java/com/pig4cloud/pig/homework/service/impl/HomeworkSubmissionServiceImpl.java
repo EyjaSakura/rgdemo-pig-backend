@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.pig4cloud.pig.homework.entity.HomeworkSubmissionEntity;
 import com.pig4cloud.pig.homework.mapper.HomeworkSubmissionMapper;
 import com.pig4cloud.pig.homework.service.HomeworkSubmissionService;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 /**
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
  * @author EyjaSakura
  * @date 2026-03-22 16:11:52
  */
+@AllArgsConstructor
 @Service
 public class HomeworkSubmissionServiceImpl extends ServiceImpl<HomeworkSubmissionMapper, HomeworkSubmissionEntity> implements HomeworkSubmissionService {
 

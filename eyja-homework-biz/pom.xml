@@ -72,6 +72,12 @@
 			<groupId>com.mysql</groupId>
 			<artifactId>mysql-connector-j</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.pig4cloud</groupId>
+			<artifactId>pig-upms-biz</artifactId>
+			<version>3.9.2</version>
+			<scope>compile</scope>
+		</dependency>
 	</dependencies>
 
 	<!-- 3. 照抄打包插件，作为独立微服务启动 -->

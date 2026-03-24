@@ -176,21 +176,26 @@ public class SysUser implements Serializable {
 	private String email;
 
 	/**
-	 * 性别
+	 * 性别（非框架原有）
 	 */
 	@Schema(description = "性别")
 	private String sex;
 
 	/**
-	 * 个性签名
+	 * 个性签名（非框架原有）
 	 */
 	@Schema(description = "个性签名")
 	private String signature;
 
 	/**
-	 * 入学年份
+	 * 入学年份（非框架原有）
 	 */
-	@Schema(description = "enroll_year")
+	@Schema(description = "入学年份")
 	private String enrollYear;
 
+	/**
+	 * 用户类型（非框架原有）
+	 */
+	@Schema(description = "用户类型")
+	private String userType;
 }

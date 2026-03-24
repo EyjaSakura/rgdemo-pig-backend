@@ -21,10 +21,7 @@ package com.pig4cloud.pig.admin.controller;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pig4cloud.pig.admin.api.dto.ResetPwdDTO;
-import com.pig4cloud.pig.admin.api.dto.UserDTO;
-import com.pig4cloud.pig.admin.api.dto.UserProfileDTO;
-import com.pig4cloud.pig.admin.api.dto.UserInfo;
+import com.pig4cloud.pig.admin.api.dto.*;
 import com.pig4cloud.pig.admin.api.entity.SysUser;
 import com.pig4cloud.pig.admin.api.vo.UserCenterVO;
 import com.pig4cloud.pig.admin.api.vo.UserExcelVO;
@@ -288,5 +285,23 @@ public class SysUserController {
 	@Operation(summary = "获取个人中心信息")
 	public R<UserCenterVO> getUserCenter() {
 		return R.ok(userService.getUserCenterInfo());
+	}
+
+	// 这个不是框架原有的
+	// Excel批量导入学生
+	@PostMapping("/import-student")
+	@HasPermission("sys_student_import")
+	@Operation(summary = "Excel批量导入学生", description = "Excel批量导入学生")
+	public R importStudent(@RequestExcel List<StudentExcelDTO> excelVOList, BindingResult bindingResult) {
+		return userService.importStudents(excelVOList, bindingResult);
+	}
+
+	// 这个不是框架原有的
+	// Excel批量导入学生
+	@PostMapping("/import-teacher")
+	@HasPermission("sys_teacher_import")
+	@Operation(summary = "Excel批量导入教师", description = "Excel批量导入教师")
+	public R importTeacher(@RequestExcel List<TeacherExcelDTO> excelVOList, BindingResult bindingResult) {
+		return userService.importTeachers(excelVOList, bindingResult);
 	}
 }

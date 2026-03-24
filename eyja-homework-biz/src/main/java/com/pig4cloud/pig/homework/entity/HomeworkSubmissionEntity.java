@@ -41,10 +41,22 @@ public class HomeworkSubmissionEntity extends Model<HomeworkSubmissionEntity> {
     private Long studentId;
 
 	/**
+	 * 学生提交的正文内容
+	 */
+	@Schema(description = "学生提交的正文内容")
+	private String submitContent;
+
+	/**
 	* 学生上传的作业文件URL
 	*/
     @Schema(description="学生上传的作业文件URL")
     private String fileUrl;
+
+	/**
+	 * 教师批阅评语
+	 */
+	@Schema(description = "教师批阅评语")
+	private String teacherComment;
 
 	/**
 	* 教师打分
@@ -56,13 +68,20 @@ public class HomeworkSubmissionEntity extends Model<HomeworkSubmissionEntity> {
 	* 状态 (0未交 1已交待批 2已批阅)
 	*/
     @Schema(description="状态 (0未交 1已交待批 2已批阅)")
-    private Integer status;
+    private String status;
 
 	/**
 	* 实际提交时间
 	*/
     @Schema(description="实际提交时间")
     private LocalDateTime submitTime;
+
+	/**
+	 * 创建时间
+	 */
+	@Schema(description = "创建时间")
+	@TableField(fill = FieldFill.INSERT)
+	private LocalDateTime createTime;
 
 	/**
 	* 教师批阅时间
@@ -78,4 +97,5 @@ public class HomeworkSubmissionEntity extends Model<HomeworkSubmissionEntity> {
 	@TableField(fill = FieldFill.INSERT)
     @Schema(description="逻辑删除标记")
     private String delFlag;
+
 }

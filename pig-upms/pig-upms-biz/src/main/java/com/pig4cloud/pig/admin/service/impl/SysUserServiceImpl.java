@@ -26,10 +26,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.pig4cloud.pig.admin.api.dto.RegisterUserDTO;
-import com.pig4cloud.pig.admin.api.dto.ResetPwdDTO;
-import com.pig4cloud.pig.admin.api.dto.UserDTO;
-import com.pig4cloud.pig.admin.api.dto.UserInfo;
+import com.pig4cloud.pig.admin.api.dto.*;
 import com.pig4cloud.pig.admin.api.entity.*;
 import com.pig4cloud.pig.admin.api.util.ParamResolver;
 import com.pig4cloud.pig.admin.api.vo.UserCenterVO;
@@ -559,6 +556,139 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 		vo.setSignature(sysUser.getSignature());
 
 		return vo;
+	}
+
+	// 非框架原有
+	// Excel批量导入学生
+
+	@Override
+	public R importStudents(List<StudentExcelDTO> excelVOList, BindingResult bindingResult) {
+		// 获取基础校验的报错信息
+		List<ErrorMessage> errorMessageList = (List<ErrorMessage>) bindingResult.getTarget();
+
+		// 提前查出全校的部门树和角色表
+		List<SysDept> allDeptList = sysDeptService.list();
+		SysRole studentRole = sysRoleService.getOne(Wrappers.<SysRole>lambdaQuery().eq(SysRole::getRoleCode, "ROLE_STUDENT"));
+
+		if (studentRole == null) {
+			return R.failed("系统未配置学生角色，请联系管理员核对角色编码！");
+		}
+
+		// 开始遍历教务老师上传的 Excel 数据
+		for (StudentExcelDTO excel : excelVOList) {
+			Set<String> errorMsg = new HashSet<>();
+
+			// 查重：判断学号是否已存在
+			long count = this.count(Wrappers.<SysUser>lambdaQuery().eq(SysUser::getUsername, excel.getUsername()));
+			if (count > 0) {
+				errorMsg.add("学号 [" + excel.getUsername() + "] 已存在");
+			}
+
+			// 找班级：拿着 Excel 里的汉字去找 ID。
+			// deptCategory 必须是 '4'（层级：0学校/1职能/2学院/3专业/4班级）
+			Optional<SysDept> classDept = allDeptList.stream()
+					.filter(dept -> excel.getClassName().equals(dept.getName()) && "4".equals(dept.getDeptCategory()))
+					.findFirst();
+
+			if (classDept.isEmpty()) {
+				errorMsg.add("找不到班级 [" + excel.getClassName() + "]，请检查名称是否完整或是否为班级层次");
+			}
+
+			// 校验完毕，拼装对象并入库
+			if (CollUtil.isEmpty(errorMsg)) {
+				UserDTO userDTO = new UserDTO();
+				userDTO.setUsername(excel.getUsername()); // 学号
+				userDTO.setName(excel.getName());         // 姓名
+				userDTO.setSex(excel.getSex());           // 性别
+				userDTO.setEmail(excel.getEmail());       // 邮箱
+				userDTO.setPhone(excel.getPhone());       // 手机号
+				userDTO.setEnrollYear(excel.getEnrollYear()); // 入学年份
+
+				// 核心身份
+				userDTO.setDeptId(classDept.get().getDeptId()); // 关联真实的班级 ID
+				userDTO.setUserType("3");                       // 身份标识为学生 (1管理 2教师 3学生)
+				userDTO.setPassword("666666");                  // 强制初始化密码
+				userDTO.setRole(Collections.singletonList(studentRole.getRoleId())); // 绑定学生角色
+
+				// 调用原生的保存逻辑
+				this.saveUser(userDTO);
+			} else {
+				// 如果有错误，记录这一行的报错信息
+				errorMessageList.add(new ErrorMessage(excel.getLineNum(), errorMsg));
+			}
+		}
+
+		// 汇总报错信息返回给前端
+		if (CollUtil.isNotEmpty(errorMessageList)) {
+			return R.failed(errorMessageList);
+		}
+		return R.ok(null, "学生批量导入成功！");
+	}
+
+	// 非框架原有
+	// Excel批量导入教师
+
+	@Override
+	public R importTeachers(List<TeacherExcelDTO> excelVOList, BindingResult bindingResult) {
+		// 获取基础校验的报错信息
+		List<ErrorMessage> errorMessageList = (List<ErrorMessage>) bindingResult.getTarget();
+
+		// 提前查出全校的部门树和角色表
+		List<SysDept> allDeptList = sysDeptService.list();
+		SysRole teacherRole = sysRoleService.getOne(Wrappers.<SysRole>lambdaQuery().eq(SysRole::getRoleCode, "ROLE_TEACHER"));
+
+		if (teacherRole == null) {
+			return R.failed("系统未配置教师角色，请联系管理员核对角色编码！");
+		}
+
+		// 开始遍历教务老师上传的 Excel 数据
+		for (TeacherExcelDTO excel : excelVOList) {
+			Set<String> errorMsg = new HashSet<>();
+
+			// 查重：判断教工号是否已存在
+			long count = this.count(Wrappers.<SysUser>lambdaQuery().eq(SysUser::getUsername, excel.getUsername()));
+			if (count > 0) {
+				errorMsg.add("教工号 [" + excel.getUsername() + "] 已存在");
+			}
+
+			// 找班级：拿着 Excel 里的汉字去找 ID。
+			// deptCategory 必须是 '2'（层级：0学校/1职能/2学院/3专业/4班级）
+			Optional<SysDept> collegeDept = allDeptList.stream()
+					.filter(dept -> excel.getCollegeName().equals(dept.getName()) && "2".equals(dept.getDeptCategory()))
+					.findFirst();
+
+			if (collegeDept.isEmpty()) {
+				errorMsg.add("找不到学院 [" + excel.getCollegeName() + "]，请检查名称是否完整或是否为学院层次");
+			}
+
+			// 校验完毕，拼装对象并入库
+			if (CollUtil.isEmpty(errorMsg)) {
+				UserDTO userDTO = new UserDTO();
+				userDTO.setUsername(excel.getUsername()); // 教工号
+				userDTO.setName(excel.getName());         // 姓名
+				userDTO.setSex(excel.getSex());           // 性别
+				userDTO.setEmail(excel.getEmail());       // 邮箱
+				userDTO.setPhone(excel.getPhone());       // 手机号
+
+				// 核心身份
+				userDTO.setDeptId(collegeDept.get().getDeptId()); // 关联真实的学院 ID
+				userDTO.setUserType("2");                       // 身份标识为教师 (1管理 2教师 3学生)
+				userDTO.setPassword("777777");                  // 强制初始化密码
+				userDTO.setRole(Collections.singletonList(teacherRole.getRoleId())); // 绑定学生角色
+
+				// 调用原生的保存逻辑
+				this.saveUser(userDTO);
+			} else {
+				// 如果有错误，记录这一行的报错信息
+				errorMessageList.add(new ErrorMessage(excel.getLineNum(), errorMsg));
+			}
+		}
+
+		// 汇总报错信息返回给前端
+		if (CollUtil.isNotEmpty(errorMessageList)) {
+			return R.failed(errorMessageList);
+		}
+		return R.ok(null, "教师批量导入成功！");
 	}
 
 }

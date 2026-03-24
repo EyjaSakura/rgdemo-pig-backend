@@ -64,6 +64,26 @@ public class HomeworkEntity extends Model<HomeworkEntity> {
     private LocalDateTime deadline;
 
 	/**
+	 * 创建人(教师)
+	 */
+	@Schema(description = "创建人(教师)")
+	private String createBy;
+
+	/**
+	 * 创建时间
+	 */
+	@Schema(description = "创建时间")
+	@TableField(fill = FieldFill.INSERT)
+	private LocalDateTime createTime;
+
+	/**
+	 * 修改时间
+	 */
+	@Schema(description = "修改时间")
+	@TableField(fill = FieldFill.INSERT_UPDATE)
+	private LocalDateTime updateTime;
+
+	/**
 	* 逻辑删除标记
 	*/
     @TableLogic

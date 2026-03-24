@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pig4cloud.pig.common.core.util.R;
 import com.pig4cloud.pig.common.log.annotation.SysLog;
+import com.pig4cloud.pig.homework.dto.HomeworkDTO;
 import com.pig4cloud.plugin.excel.annotation.ResponseExcel;
 import com.pig4cloud.plugin.excel.annotation.RequestExcel;
 import com.pig4cloud.pig.homework.entity.HomeworkEntity;
@@ -15,6 +16,7 @@ import com.pig4cloud.pig.homework.service.HomeworkService;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import com.pig4cloud.pig.common.security.annotation.HasPermission;
+import jakarta.validation.Valid;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpHeaders;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -134,4 +136,13 @@ public class HomeworkController {
     public R importExcel(@RequestExcel List<HomeworkEntity> homeworkList, BindingResult bindingResult) {
         return R.ok(homeworkService.saveBatch(homeworkList));
     }
+
+	// 发布作业
+	@PostMapping("/publish")
+	@Operation(summary = "教师发布作业", description = "教师发布作业")
+	// @HasPermission("biz_homework_publish")
+	public R<Long> publish(@RequestBody @Valid HomeworkDTO homeworkDTO) {
+		return R.ok(homeworkService.publishHomework(homeworkDTO));
+	}
+
 }
