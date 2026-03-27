@@ -45,6 +45,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 用户管理控制器
@@ -303,5 +304,21 @@ public class SysUserController {
 	@Operation(summary = "Excel批量导入教师", description = "Excel批量导入教师")
 	public R importTeacher(@RequestExcel List<TeacherExcelDTO> excelVOList, BindingResult bindingResult) {
 		return userService.importTeachers(excelVOList, bindingResult);
+	}
+
+	// 这个不是框架原有的
+	// 根据班级ID获取该班级所有学生ID
+	// Inner内部调用，无需token
+	@Inner
+	@GetMapping("/student/ids/{deptId}")
+	public R<List<Long>> getStudentIdsByDeptId(@PathVariable("deptId") Long deptId) {
+		// 查出该班级所有学生
+		List<SysUser> studentList = userService.list(Wrappers.<SysUser>lambdaQuery()
+				.eq(SysUser::getDeptId, deptId)
+				.eq(SysUser::getUserType, "3"));
+
+		// 提取出 ID 列表
+		List<Long> ids = studentList.stream().map(SysUser::getUserId).collect(Collectors.toList());
+		return R.ok(ids);
 	}
 }

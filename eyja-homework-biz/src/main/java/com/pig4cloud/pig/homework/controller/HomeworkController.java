@@ -140,7 +140,7 @@ public class HomeworkController {
 	// 发布作业
 	@PostMapping("/publish")
 	@Operation(summary = "教师发布作业", description = "教师发布作业")
-	// @HasPermission("biz_homework_publish")
+	@HasPermission("homework_homework_publish")
 	public R<Long> publish(@RequestBody @Valid HomeworkDTO homeworkDTO) {
 		return R.ok(homeworkService.publishHomework(homeworkDTO));
 	}
