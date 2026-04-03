@@ -19,7 +19,6 @@ package com.pig4cloud.pig.admin.controller;
 
 import com.pig4cloud.pig.admin.api.feign.RemoteTokenService;
 import com.pig4cloud.pig.common.core.util.R;
-import com.pig4cloud.pig.common.log.annotation.SysLog;
 import com.pig4cloud.pig.common.security.annotation.HasPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -62,7 +61,7 @@ public class SysTokenController {
 	 * @param tokens 需要删除的token数组
 	 * @return 操作结果，成功返回success，失败返回false
 	 */
-	@SysLog("删除用户token")
+	
 	@DeleteMapping("/delete")
 	@HasPermission("sys_token_del")
 	@Operation(summary = "删除用户token", description = "删除用户token")

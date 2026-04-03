@@ -24,7 +24,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pig4cloud.pig.admin.api.entity.SysPublicParam;
 import com.pig4cloud.pig.admin.service.SysPublicParamService;
 import com.pig4cloud.pig.common.core.util.R;
-import com.pig4cloud.pig.common.log.annotation.SysLog;
 import com.pig4cloud.pig.common.security.annotation.HasPermission;
 import com.pig4cloud.pig.common.security.annotation.Inner;
 import com.pig4cloud.plugin.excel.annotation.ResponseExcel;
@@ -113,7 +112,7 @@ public class SysPublicParamController {
 	 * @return 操作结果
 	 */
 	@PostMapping
-	@SysLog("新增公共参数")
+	
 	@Operation(description = "新增公共参数", summary = "新增公共参数")
 	@HasPermission("sys_syspublicparam_add")
 	public R saveParam(@RequestBody SysPublicParam sysPublicParam) {
@@ -126,7 +125,7 @@ public class SysPublicParamController {
 	 * @return 操作结果
 	 */
 	@PutMapping
-	@SysLog("修改公共参数")
+	
 	@HasPermission("sys_syspublicparam_edit")
 	@Operation(description = "修改公共参数", summary = "修改公共参数")
 	public R updateParam(@RequestBody SysPublicParam sysPublicParam) {
@@ -139,7 +138,7 @@ public class SysPublicParamController {
 	 * @return 操作结果
 	 */
 	@DeleteMapping
-	@SysLog("删除公共参数")
+	
 	@HasPermission("sys_syspublicparam_del")
 	@Operation(description = "删除公共参数", summary = "删除公共参数")
 	public R removeById(@RequestBody Long[] ids) {
@@ -162,7 +161,7 @@ public class SysPublicParamController {
 	 * 同步参数到缓存
 	 * @return 操作结果
 	 */
-	@SysLog("同步参数")
+	
 	@PutMapping("/sync")
 	@HasPermission("sys_syspublicparam_edit")
 	@Operation(description = "同步参数到缓存", summary = "同步参数到缓存")

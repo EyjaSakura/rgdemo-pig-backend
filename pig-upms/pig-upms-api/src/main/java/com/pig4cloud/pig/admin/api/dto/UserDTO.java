@@ -19,16 +19,15 @@
 
 package com.pig4cloud.pig.admin.api.dto;
 
-import java.io.Serial;
-import java.util.List;
-
 import com.pig4cloud.pig.admin.api.entity.SysUser;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.io.Serial;
+import java.util.List;
 
 /**
  * @author lengleng
@@ -53,11 +52,6 @@ public class UserDTO extends SysUser {
 	 */
 	@Schema(description = "部门id")
 	private Long deptId;
-
-	/**
-	 * 岗位ID
-	 */
-	private List<Long> post;
 
 	/**
 	 * 新密码

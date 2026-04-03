@@ -63,11 +63,6 @@
 			</dependency>
 			<dependency>
 				<groupId>com.pig4cloud</groupId>
-				<artifactId>pig-common-log</artifactId>
-				<version>${revision}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.pig4cloud</groupId>
 				<artifactId>pig-common-mybatis</artifactId>
 				<version>${revision}</version>
 			</dependency>

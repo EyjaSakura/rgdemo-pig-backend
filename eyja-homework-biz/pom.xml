@@ -52,12 +52,6 @@
 			<artifactId>pig-common-mybatis</artifactId>
 		</dependency>
 
-		<!-- 日志模块 (可选，用于 @SysLog 注解记录操作日志) -->
-		<dependency>
-			<groupId>com.pig4cloud</groupId>
-			<artifactId>pig-common-log</artifactId>
-		</dependency>
-
 		<!-- Swagger/OpenAPI (必须，用于生成接口文档) -->
 		<dependency>
 			<groupId>com.pig4cloud</groupId>

@@ -26,8 +26,6 @@ import com.pig4cloud.pig.auth.support.handler.PigAuthenticationFailureEventHandl
 import com.pig4cloud.pig.auth.support.handler.PigAuthenticationSuccessEventHandler;
 import com.pig4cloud.pig.auth.support.password.OAuth2ResourceOwnerPasswordAuthenticationConverter;
 import com.pig4cloud.pig.auth.support.password.OAuth2ResourceOwnerPasswordAuthenticationProvider;
-import com.pig4cloud.pig.auth.support.sms.OAuth2ResourceOwnerSmsAuthenticationConverter;
-import com.pig4cloud.pig.auth.support.sms.OAuth2ResourceOwnerSmsAuthenticationProvider;
 import com.pig4cloud.pig.common.core.constant.SecurityConstants;
 import com.pig4cloud.pig.common.security.component.PigBootCorsProperties;
 import lombok.RequiredArgsConstructor;
@@ -147,7 +145,7 @@ public class AuthorizationServerConfiguration {
 	public AuthenticationConverter accessTokenRequestConverter() {
 		return new DelegatingAuthenticationConverter(Arrays.asList(
 				new OAuth2ResourceOwnerPasswordAuthenticationConverter(),
-				new OAuth2ResourceOwnerSmsAuthenticationConverter(), new OAuth2RefreshTokenAuthenticationConverter(),
+				new OAuth2RefreshTokenAuthenticationConverter(),
 				new OAuth2ClientCredentialsAuthenticationConverter(),
 				new OAuth2AuthorizationCodeAuthenticationConverter(),
 				new OAuth2AuthorizationCodeRequestAuthenticationConverter()));
@@ -157,7 +155,6 @@ public class AuthorizationServerConfiguration {
 	 * 注入授权模式实现提供方
 	 * <p>
 	 * 1. 密码模式 </br>
-	 * 2. 短信登录 </br>
 	 */
 	private void addCustomOAuth2GrantAuthenticationProvider(HttpSecurity http) {
 		AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
@@ -166,15 +163,10 @@ public class AuthorizationServerConfiguration {
 		OAuth2ResourceOwnerPasswordAuthenticationProvider resourceOwnerPasswordAuthenticationProvider = new OAuth2ResourceOwnerPasswordAuthenticationProvider(
 				authenticationManager, authorizationService, oAuth2TokenGenerator());
 
-		OAuth2ResourceOwnerSmsAuthenticationProvider resourceOwnerSmsAuthenticationProvider = new OAuth2ResourceOwnerSmsAuthenticationProvider(
-				authenticationManager, authorizationService, oAuth2TokenGenerator());
-
 		// 处理 UsernamePasswordAuthenticationToken
 		http.authenticationProvider(new PigDaoAuthenticationProvider());
 		// 处理 OAuth2ResourceOwnerPasswordAuthenticationToken
 		http.authenticationProvider(resourceOwnerPasswordAuthenticationProvider);
-		// 处理 OAuth2ResourceOwnerSmsAuthenticationToken
-		http.authenticationProvider(resourceOwnerSmsAuthenticationProvider);
 	}
 
 	/**

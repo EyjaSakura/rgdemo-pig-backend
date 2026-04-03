@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pig4cloud.pig.common.core.util.R;
-import com.pig4cloud.pig.common.log.annotation.SysLog;
 import com.pig4cloud.plugin.excel.annotation.ResponseExcel;
 import com.pig4cloud.plugin.excel.annotation.RequestExcel;
 import com.pig4cloud.pig.homework.entity.CourseClassEntity;
@@ -75,7 +74,6 @@ public class CourseClassController {
      * @return R
      */
     @Operation(summary = "新增必修课-班级自动关联表" , description = "新增必修课-班级自动关联表" )
-    @SysLog("新增必修课-班级自动关联表" )
     @PostMapping
     @HasPermission("homework_courseClass_add")
     public R save(@RequestBody CourseClassEntity courseClass) {
@@ -88,7 +86,6 @@ public class CourseClassController {
      * @return R
      */
     @Operation(summary = "修改必修课-班级自动关联表" , description = "修改必修课-班级自动关联表" )
-    @SysLog("修改必修课-班级自动关联表" )
     @PutMapping
     @HasPermission("homework_courseClass_edit")
     public R updateById(@RequestBody CourseClassEntity courseClass) {
@@ -101,7 +98,6 @@ public class CourseClassController {
      * @return R
      */
     @Operation(summary = "通过id删除必修课-班级自动关联表" , description = "通过id删除必修课-班级自动关联表" )
-    @SysLog("通过id删除必修课-班级自动关联表" )
     @DeleteMapping
     @HasPermission("homework_courseClass_del")
     public R removeById(@RequestBody Long[] ids) {

@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pig4cloud.pig.common.core.util.R;
-import com.pig4cloud.pig.common.log.annotation.SysLog;
 import com.pig4cloud.plugin.excel.annotation.ResponseExcel;
 import com.pig4cloud.plugin.excel.annotation.RequestExcel;
 import com.pig4cloud.pig.homework.entity.HomeworkSubmissionEntity;
@@ -76,7 +75,6 @@ public class HomeworkSubmissionController {
      * @return R
      */
     @Operation(summary = "新增作业提交与批阅表" , description = "新增作业提交与批阅表" )
-    @SysLog("新增作业提交与批阅表" )
     @PostMapping
     @HasPermission("homework_homeworkSubmission_add")
     public R save(@RequestBody HomeworkSubmissionEntity homeworkSubmission) {
@@ -89,7 +87,6 @@ public class HomeworkSubmissionController {
      * @return R
      */
     @Operation(summary = "修改作业提交与批阅表" , description = "修改作业提交与批阅表" )
-    @SysLog("修改作业提交与批阅表" )
     @PutMapping
     @HasPermission("homework_homeworkSubmission_edit")
     public R updateById(@RequestBody HomeworkSubmissionEntity homeworkSubmission) {
@@ -102,7 +99,6 @@ public class HomeworkSubmissionController {
      * @return R
      */
     @Operation(summary = "通过id删除作业提交与批阅表" , description = "通过id删除作业提交与批阅表" )
-    @SysLog("通过id删除作业提交与批阅表" )
     @DeleteMapping
     @HasPermission("homework_homeworkSubmission_del")
     public R removeById(@RequestBody Long[] ids) {

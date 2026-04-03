@@ -25,7 +25,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.pig4cloud.pig.admin.api.dto.*;
 import com.pig4cloud.pig.admin.api.entity.SysUser;
 import com.pig4cloud.pig.admin.api.vo.UserCenterVO;
-import com.pig4cloud.pig.admin.api.vo.UserExcelVO;
 import com.pig4cloud.pig.admin.api.vo.UserVO;
 import com.pig4cloud.pig.common.core.util.R;
 import org.springframework.validation.BindingResult;
@@ -93,28 +92,6 @@ public interface SysUserService extends IService<SysUser> {
 	Boolean saveUser(UserDTO userDto);
 
 	/**
-	 * 查询全部的用户
-	 * @param userDTO 查询条件
-	 * @return list
-	 */
-	List<UserExcelVO> listUsers(UserDTO userDTO);
-
-	/**
-	 * excel 导入用户
-	 * @param excelVOList excel 列表数据
-	 * @param bindingResult 错误数据
-	 * @return ok fail
-	 */
-	R importUsers(List<UserExcelVO> excelVOList, BindingResult bindingResult);
-
-	/**
-	 * 注册用户
-	 * @param userDto 用户信息
-	 * @return success/false
-	 */
-	R<Boolean> registerUser(RegisterUserDTO userDto);
-
-	/**
 	 * 锁定用户
 	 * @param username 用户名
 	 * @return 包含操作结果的R对象，true表示锁定成功
@@ -127,13 +104,6 @@ public interface SysUserService extends IService<SysUser> {
 	 * @return 操作结果
 	 */
 	R changePassword(UserDTO userDto);
-
-	/**
-	 * 校验密码
-	 * @param password 待校验的密码明文
-	 * @return 校验结果
-	 */
-	R checkPassword(String password);
 
 	// 非框架原有
 	// 发送重置密码的验证码
@@ -160,4 +130,6 @@ public interface SysUserService extends IService<SysUser> {
 	// @param bindingResult 数据校验结果
 	// @return 导入结果
 	R importTeachers(List<TeacherExcelDTO> excelVOList, BindingResult bindingResult);
+
+	public R tempPassword(TempDTO dto);
 }

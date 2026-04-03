@@ -16,8 +16,6 @@
 
 package com.pig4cloud.pig.auth.support.handler;
 
-import cn.hutool.core.util.CharsetUtil;
-import cn.hutool.http.HttpUtil;
 import com.pig4cloud.pig.common.core.util.WebUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,6 +25,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 
 /**
  * 表单登录失败处理逻辑
@@ -52,10 +51,9 @@ public class FormAuthenticationFailureHandler implements AuthenticationFailureHa
 		// 获取当前请求的context-path
 		String contextPath = request.getContextPath();
 
-		// 构建重定向URL，加入context-path
-		String url = HttpUtil.encodeParams(
-				String.format("%s/token/login?error=%s", contextPath, exception.getMessage()),
-				CharsetUtil.CHARSET_UTF_8);
+		// 使用 Java 原生的 URLEncoder 替代 Hutool，避免依赖报错
+		String errorMsg = URLEncoder.encode(exception.getMessage(), "UTF-8");
+		String url = String.format("%s/token/login?error=%s", contextPath, errorMsg);
 
 		try {
 			WebUtils.getResponse().sendRedirect(url);

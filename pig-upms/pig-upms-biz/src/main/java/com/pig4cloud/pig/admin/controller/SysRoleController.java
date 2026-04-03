@@ -24,12 +24,10 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pig4cloud.pig.admin.api.entity.SysRole;
-import com.pig4cloud.pig.admin.api.vo.RoleExcelVO;
 import com.pig4cloud.pig.admin.api.vo.RoleVO;
 import com.pig4cloud.pig.admin.service.SysRoleService;
 import com.pig4cloud.pig.common.core.constant.CacheConstants;
 import com.pig4cloud.pig.common.core.util.R;
-import com.pig4cloud.pig.common.log.annotation.SysLog;
 import com.pig4cloud.pig.common.security.annotation.HasPermission;
 import com.pig4cloud.plugin.excel.annotation.RequestExcel;
 import com.pig4cloud.plugin.excel.annotation.ResponseExcel;
@@ -88,7 +86,7 @@ public class SysRoleController {
 	 * @param sysRole 角色信息
 	 * @return 操作结果，成功返回success，失败返回false
 	 */
-	@SysLog("添加角色")
+	
 	@PostMapping
 	@HasPermission("sys_role_add")
 	@Operation(summary = "添加角色", description = "添加角色")
@@ -102,7 +100,7 @@ public class SysRoleController {
 	 * @param sysRole 角色信息
 	 * @return 操作结果，成功返回success，失败返回false
 	 */
-	@SysLog("修改角色信息")
+	
 	@PutMapping
 	@HasPermission("sys_role_edit")
 	@Operation(summary = "修改角色信息", description = "修改角色信息")
@@ -116,7 +114,7 @@ public class SysRoleController {
 	 * @param ids 角色ID数组
 	 * @return 操作结果
 	 */
-	@SysLog("删除角色")
+	
 	@DeleteMapping
 	@HasPermission("sys_role_del")
 	@Operation(summary = "根据ID数组删除角色", description = "根据ID数组删除角色")
@@ -153,7 +151,7 @@ public class SysRoleController {
 	 * @param roleVo 角色VO对象
 	 * @return 操作结果，成功返回success，失败返回false
 	 */
-	@SysLog("更新角色菜单")
+	
 	@PutMapping("/menu")
 	@HasPermission("sys_role_perm")
 	@Operation(summary = "更新角色菜单", description = "更新角色菜单")
@@ -170,31 +168,6 @@ public class SysRoleController {
 	@Operation(summary = "通过角色ID列表查询角色信息", description = "通过角色ID列表查询角色信息")
 	public R getRoleList(@RequestBody List<Long> roleIdList) {
 		return R.ok(sysRoleService.listRolesByRoleIds(roleIdList, CollUtil.join(roleIdList, StrUtil.UNDERLINE)));
-	}
-
-	/**
-	 * 导出角色数据到Excel表格
-	 * @return 角色数据列表
-	 */
-	@ResponseExcel
-	@GetMapping("/export")
-	@HasPermission("sys_role_export")
-	@Operation(summary = "导出角色数据到Excel表格", description = "导出角色数据到Excel表格")
-	public List<RoleExcelVO> exportRoles() {
-		return sysRoleService.listRoles();
-	}
-
-	/**
-	 * 导入角色
-	 * @param excelVOList 角色Excel数据列表
-	 * @param bindingResult 数据校验结果
-	 * @return 导入结果
-	 */
-	@PostMapping("/import")
-	@HasPermission("sys_role_export")
-	@Operation(summary = "导入角色数据", description = "导入角色数据")
-	public R importRole(@RequestExcel List<RoleExcelVO> excelVOList, BindingResult bindingResult) {
-		return sysRoleService.importRole(excelVOList, bindingResult);
 	}
 
 }

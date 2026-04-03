@@ -27,7 +27,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pig4cloud.pig.admin.api.entity.SysOauthClientDetails;
 import com.pig4cloud.pig.admin.service.SysOauthClientDetailsService;
 import com.pig4cloud.pig.common.core.util.R;
-import com.pig4cloud.pig.common.log.annotation.SysLog;
 import com.pig4cloud.pig.common.security.annotation.HasPermission;
 import com.pig4cloud.pig.common.security.annotation.Inner;
 import com.pig4cloud.plugin.excel.annotation.ResponseExcel;
@@ -93,7 +92,7 @@ public class SysClientController {
 	 * @param clientDetails 客户端详情实体
 	 * @return 操作结果，成功返回success，失败返回false
 	 */
-	@SysLog("添加终端")
+	
 	@PostMapping
 	@HasPermission("sys_client_add")
 	@Operation(summary = "添加客户端终端", description = "添加客户端终端")
@@ -106,7 +105,7 @@ public class SysClientController {
 	 * @param ids 要删除的终端ID数组
 	 * @return 操作结果，成功返回success
 	 */
-	@SysLog("删除终端")
+	
 	@DeleteMapping
 	@HasPermission("sys_client_del")
 	@Operation(summary = "根据ID列表批量删除终端", description = "根据ID列表批量删除终端")
@@ -120,7 +119,7 @@ public class SysClientController {
 	 * @param clientDetails 终端实体信息
 	 * @return 操作结果
 	 */
-	@SysLog("编辑终端")
+	
 	@PutMapping
 	@HasPermission("sys_client_edit")
 	@Operation(summary = "编辑终端信息", description = "编辑终端信息")
@@ -145,7 +144,7 @@ public class SysClientController {
 	 * 同步缓存字典
 	 * @return 操作结果
 	 */
-	@SysLog("同步终端")
+	
 	@PutMapping("/sync")
 	@Operation(summary = "同步缓存字典", description = "同步缓存字典")
 	public R syncClient() {
@@ -158,7 +157,7 @@ public class SysClientController {
 	 * @return 符合条件的客户端列表
 	 */
 	@ResponseExcel
-	@SysLog("导出excel")
+	
 	@GetMapping("/export")
 	@Operation(summary = "导出客户端信息到Excel", description = "导出客户端信息到Excel")
 	public List<SysOauthClientDetails> exportClients(SysOauthClientDetails sysOauthClientDetails) {

@@ -25,7 +25,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pig4cloud.pig.admin.api.entity.SysFile;
 import com.pig4cloud.pig.admin.service.SysFileService;
 import com.pig4cloud.pig.common.core.util.R;
-import com.pig4cloud.pig.common.log.annotation.SysLog;
 import com.pig4cloud.pig.common.security.annotation.HasPermission;
 import com.pig4cloud.pig.common.security.annotation.Inner;
 import io.swagger.v3.oas.annotations.Operation;
@@ -76,7 +75,7 @@ public class SysFileController {
 	 * @param ids 要删除的文件id数组
 	 * @return 操作结果
 	 */
-	@SysLog("删除文件管理")
+	
 	@DeleteMapping
 	@HasPermission("sys_file_del")
 	@Operation(summary = "通过id删除文件管理", description = "通过id删除文件管理")

@@ -29,7 +29,6 @@ import com.pig4cloud.pig.admin.service.SysDictItemService;
 import com.pig4cloud.pig.admin.service.SysDictService;
 import com.pig4cloud.pig.common.core.constant.CacheConstants;
 import com.pig4cloud.pig.common.core.util.R;
-import com.pig4cloud.pig.common.log.annotation.SysLog;
 import com.pig4cloud.pig.common.security.annotation.Inner;
 import com.pig4cloud.plugin.excel.annotation.ResponseExcel;
 import io.swagger.v3.oas.annotations.Operation;
@@ -106,7 +105,7 @@ public class SysDictController {
 	 * @param sysDict 字典信息对象
 	 * @return 操作结果，包含保存的字典信息
 	 */
-	@SysLog("添加字典")
+	
 	@PostMapping
 	@Operation(summary = "保存字典信息", description = "保存字典信息")
 	@PreAuthorize("@pms.hasPermission('sys_dict_add')")
@@ -120,7 +119,7 @@ public class SysDictController {
 	 * @param ids 字典ID数组
 	 * @return 操作结果
 	 */
-	@SysLog("删除字典")
+	
 	@DeleteMapping
 	@PreAuthorize("@pms.hasPermission('sys_dict_del')")
 	@Operation(summary = "删除字典并清除字典缓存", description = "删除字典并清除字典缓存")
@@ -135,7 +134,7 @@ public class SysDictController {
 	 * @return 操作结果 success/false
 	 */
 	@PutMapping
-	@SysLog("修改字典")
+	
 	@PreAuthorize("@pms.hasPermission('sys_dict_edit')")
 	@Operation(summary = "修改字典信息", description = "修改字典信息")
 	public R updateDict(@Valid @RequestBody SysDict sysDict) {
@@ -195,7 +194,7 @@ public class SysDictController {
 	 * @param sysDictItem 字典项对象
 	 * @return 操作结果
 	 */
-	@SysLog("新增字典项")
+	
 	@PostMapping("/item")
 	@Operation(summary = "新增字典项", description = "新增字典项")
 	@CacheEvict(value = CacheConstants.DICT_DETAILS, allEntries = true)
@@ -208,7 +207,7 @@ public class SysDictController {
 	 * @param sysDictItem 要修改的字典项对象
 	 * @return 操作结果
 	 */
-	@SysLog("修改字典项")
+	
 	@PutMapping("/item")
 	@Operation(summary = "修改字典项", description = "修改字典项")
 	public R updateDictItem(@RequestBody SysDictItem sysDictItem) {
@@ -220,7 +219,7 @@ public class SysDictController {
 	 * @param id 字典项id
 	 * @return 操作结果
 	 */
-	@SysLog("通过id删除字典项")
+	
 	@DeleteMapping("/item/{id}")
 	@Operation(summary = "通过id删除字典项", description = "通过id删除字典项")
 	public R removeDictItemById(@PathVariable Long id) {
@@ -231,7 +230,7 @@ public class SysDictController {
 	 * 同步字典缓存
 	 * @return 操作结果
 	 */
-	@SysLog("同步字典缓存")
+	
 	@PutMapping("/sync")
 	@Operation(summary = "同步字典缓存", description = "同步字典缓存")
 	public R syncDict() {

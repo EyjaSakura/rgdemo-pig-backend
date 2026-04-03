@@ -68,11 +68,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-undertow</artifactId>
         </dependency>
-        <!-- log -->
-        <dependency>
-            <groupId>com.pig4cloud</groupId>
-            <artifactId>pig-common-log</artifactId>
-        </dependency>
         <!-- 调用验证码核心模块 -->
         <dependency>
             <groupId>com.pig4cloud.plugin</groupId>

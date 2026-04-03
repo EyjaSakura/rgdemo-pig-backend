@@ -30,12 +30,13 @@ import com.pig4cloud.pig.admin.api.dto.*;
 import com.pig4cloud.pig.admin.api.entity.*;
 import com.pig4cloud.pig.admin.api.util.ParamResolver;
 import com.pig4cloud.pig.admin.api.vo.UserCenterVO;
-import com.pig4cloud.pig.admin.api.vo.UserExcelVO;
 import com.pig4cloud.pig.admin.api.vo.UserVO;
 import com.pig4cloud.pig.admin.mapper.SysUserMapper;
-import com.pig4cloud.pig.admin.mapper.SysUserPostMapper;
 import com.pig4cloud.pig.admin.mapper.SysUserRoleMapper;
-import com.pig4cloud.pig.admin.service.*;
+import com.pig4cloud.pig.admin.service.SysDeptService;
+import com.pig4cloud.pig.admin.service.SysMenuService;
+import com.pig4cloud.pig.admin.service.SysRoleService;
+import com.pig4cloud.pig.admin.service.SysUserService;
 import com.pig4cloud.pig.common.core.constant.CacheConstants;
 import com.pig4cloud.pig.common.core.constant.CommonConstants;
 import com.pig4cloud.pig.common.core.exception.ErrorCodes;
@@ -59,7 +60,6 @@ import org.springframework.validation.BindingResult;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * 系统用户服务实现类
@@ -81,13 +81,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
 	private final SysRoleService sysRoleService;
 
-	private final SysPostService sysPostService;
-
 	private final SysDeptService sysDeptService;
 
 	private final SysUserRoleMapper sysUserRoleMapper;
-
-	private final SysUserPostMapper sysUserPostMapper;
 
 	private final CacheManager cacheManager;
 
@@ -106,13 +102,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 		sysUser.setCreateBy(userDto.getUsername());
 		sysUser.setPassword(ENCODER.encode(userDto.getPassword()));
 		baseMapper.insert(sysUser);
-		// 保存用户岗位信息
-		Optional.ofNullable(userDto.getPost()).ifPresent(posts -> posts.forEach(postId -> {
-			SysUserPost userPost = new SysUserPost();
-			userPost.setUserId(sysUser.getUserId());
-			userPost.setPostId(postId);
-			sysUserPostMapper.insert(userPost);
-		}));
 
 		// 如果角色为空，赋默认角色
 		if (CollUtil.isEmpty(userDto.getRole())) {
@@ -158,6 +147,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 			.map(SysMenu::getPermission)
 			.toList();
 		userInfo.setPermissions(permissions);
+
+		userInfo.setFullName(sysDeptService.getFullDeptPathName(dbUser.getDept().getDeptId()));
+
 		return R.ok(userInfo);
 	}
 
@@ -215,9 +207,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 		sysUser.setPhone(userDto.getPhone());
 		sysUser.setUserId(SecurityUtils.getUser().getId());
 		sysUser.setAvatar(userDto.getAvatar());
-		sysUser.setNickname(userDto.getNickname());
 		sysUser.setName(userDto.getName());
-		sysUser.setEmail(userDto.getEmail());
 		return R.ok(this.updateById(sysUser));
 	}
 
@@ -252,162 +242,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 			});
 		}
 
-		if (Objects.nonNull(userDto.getPost())) {
-			// 删除用户岗位关系
-			sysUserPostMapper
-				.delete(Wrappers.<SysUserPost>lambdaQuery().eq(SysUserPost::getUserId, userDto.getUserId()));
-			userDto.getPost().forEach(postId -> {
-				SysUserPost userPost = new SysUserPost();
-				userPost.setUserId(sysUser.getUserId());
-				userPost.setPostId(postId);
-				sysUserPostMapper.insert(userPost);
-			});
-		}
 		return Boolean.TRUE;
-	}
-
-	/**
-	 * 查询用户列表并转换为Excel导出格式
-	 * @param userDTO 用户查询条件
-	 * @return 用户Excel视图对象列表
-	 */
-	@Override
-	public List<UserExcelVO> listUsers(UserDTO userDTO) {
-		// 根据数据权限查询全部的用户信息
-		List<UserVO> voList = baseMapper.listUsers(userDTO);
-		// 转换成execl 对象输出
-		return voList.stream().map(userVO -> {
-			UserExcelVO excelVO = new UserExcelVO();
-			BeanUtils.copyProperties(userVO, excelVO);
-			excelVO.setRoleNameList(
-					userVO.getRoleList().stream().map(SysRole::getRoleName).collect(Collectors.joining(StrUtil.COMMA)));
-			excelVO.setPostNameList(
-					userVO.getPostList().stream().map(SysPost::getPostName).collect(Collectors.joining(StrUtil.COMMA)));
-
-			if (Objects.nonNull(userVO.getDept())) {
-				excelVO.setDeptName(userVO.getDept().getName());
-			}
-			return excelVO;
-		}).toList();
-	}
-
-	/**
-	 * 导入用户数据
-	 * @param excelVOList Excel数据列表
-	 * @param bindingResult 校验结果
-	 * @return 导入结果，包含成功或失败信息
-	 */
-	@Override
-	public R importUsers(List<UserExcelVO> excelVOList, BindingResult bindingResult) {
-		// 通用校验获取失败的数据
-		List<ErrorMessage> errorMessageList = (List<ErrorMessage>) bindingResult.getTarget();
-		List<SysDept> deptList = sysDeptService.list();
-		List<SysRole> roleList = sysRoleService.list();
-		List<SysPost> postList = sysPostService.list();
-
-		// 执行数据插入操作 组装 UserDto
-		for (UserExcelVO excel : excelVOList) {
-			// 个性化校验逻辑
-			List<SysUser> userList = this.list();
-
-			Set<String> errorMsg = new HashSet<>();
-			// 校验用户名是否存在
-			if (userList.stream().anyMatch(sysUser -> excel.getUsername().equals(sysUser.getUsername()))) {
-				errorMsg.add(MsgUtils.getMessage(ErrorCodes.SYS_USER_USERNAME_EXISTING, excel.getUsername()));
-			}
-
-			// 判断输入的部门名称列表是否合法
-			Optional<SysDept> deptOptional = deptList.stream()
-				.filter(dept -> excel.getDeptName().equals(dept.getName()))
-				.findFirst();
-			if (deptOptional.isEmpty()) {
-				errorMsg.add(MsgUtils.getMessage(ErrorCodes.SYS_DEPT_DEPTNAME_INEXISTENCE, excel.getDeptName()));
-			}
-
-			// 判断输入的角色名称列表是否合法
-			List<String> roleNameList = StrUtil.split(excel.getRoleNameList(), StrUtil.COMMA);
-			List<SysRole> roleCollList = roleList.stream()
-				.filter(role -> roleNameList.stream().anyMatch(name -> role.getRoleName().equals(name)))
-				.toList();
-
-			if (roleCollList.size() != roleNameList.size()) {
-				errorMsg.add(MsgUtils.getMessage(ErrorCodes.SYS_ROLE_ROLENAME_INEXISTENCE, excel.getRoleNameList()));
-			}
-
-			// 判断输入的部门名称列表是否合法
-			List<String> postNameList = StrUtil.split(excel.getPostNameList(), StrUtil.COMMA);
-			List<SysPost> postCollList = postList.stream()
-				.filter(post -> postNameList.stream().anyMatch(name -> post.getPostName().equals(name)))
-				.toList();
-
-			if (postCollList.size() != postNameList.size()) {
-				errorMsg.add(MsgUtils.getMessage(ErrorCodes.SYS_POST_POSTNAME_INEXISTENCE, excel.getPostNameList()));
-			}
-
-			// 数据合法情况
-			if (CollUtil.isEmpty(errorMsg)) {
-				insertExcelUser(excel, deptOptional, roleCollList, postCollList);
-			}
-			else {
-				// 数据不合法情况
-				errorMessageList.add(new ErrorMessage(excel.getLineNum(), errorMsg));
-			}
-
-		}
-
-		if (CollUtil.isNotEmpty(errorMessageList)) {
-			return R.failed(errorMessageList);
-		}
-		return R.ok();
-	}
-
-	/**
-	 * 插入Excel导入的用户信息
-	 * @param excel Excel用户数据对象
-	 * @param deptOptional 部门信息Optional对象
-	 * @param roleCollList 角色列表
-	 * @param postCollList 岗位列表
-	 */
-	private void insertExcelUser(UserExcelVO excel, Optional<SysDept> deptOptional, List<SysRole> roleCollList,
-			List<SysPost> postCollList) {
-		UserDTO userDTO = new UserDTO();
-		userDTO.setUsername(excel.getUsername());
-		userDTO.setPhone(excel.getPhone());
-		userDTO.setNickname(excel.getNickname());
-		userDTO.setName(excel.getName());
-		userDTO.setEmail(excel.getEmail());
-		// 批量导入初始密码为手机号
-		userDTO.setPassword(userDTO.getPhone());
-		// 根据部门名称查询部门ID
-		userDTO.setDeptId(deptOptional.get().getDeptId());
-		// 插入岗位名称
-		List<Long> postIdList = postCollList.stream().map(SysPost::getPostId).toList();
-		userDTO.setPost(postIdList);
-		// 根据角色名称查询角色ID
-		List<Long> roleIdList = roleCollList.stream().map(SysRole::getRoleId).toList();
-		userDTO.setRole(roleIdList);
-		// 插入用户
-		this.saveUser(userDTO);
-	}
-
-	/**
-	 * 注册用户并赋予默认角色
-	 * @param userDto 用户注册信息DTO
-	 * @return 注册结果，包含成功或失败状态
-	 */
-	@Override
-	@Transactional(rollbackFor = Exception.class)
-	public R<Boolean> registerUser(RegisterUserDTO userDto) {
-		// 判断用户名是否存在
-		SysUser sysUser = this.getOne(Wrappers.<SysUser>lambdaQuery().eq(SysUser::getUsername, userDto.getUsername()));
-		if (sysUser != null) {
-			String message = MsgUtils.getMessage(ErrorCodes.SYS_USER_USERNAME_EXISTING, userDto.getUsername());
-			return R.failed(message);
-		}
-
-		UserDTO user = new UserDTO();
-		BeanUtils.copyProperties(userDto, user);
-		return R.ok(saveUser(user));
 	}
 
 	/**
@@ -441,15 +276,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 			return R.failed("用户不存在");
 		}
 
-//		if (StrUtil.isEmpty(userDto.getPassword())) {
-//			return R.failed("原密码不能为空");
-//		}
-//
-//		if (!ENCODER.matches(userDto.getPassword(), sysUser.getPassword())) {
-//			log.info("原密码错误，修改个人信息失败:{}", userDto.getUsername());
-//			return R.failed(MsgUtils.getMessage(ErrorCodes.SYS_USER_UPDATE_PASSWORDERROR));
-//		}
-
 		if (StrUtil.isEmpty(userDto.getNewpassword1())) {
 			return R.failed("新密码不能为空");
 		}
@@ -465,24 +291,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 			.set(SysUser::getPassword, password)
 			.eq(SysUser::getUserId, sysUser.getUserId()));
 		return R.ok();
-	}
-
-	/**
-	 * 校验用户密码是否正确
-	 * @param password 待校验的密码
-	 * @return 校验结果，成功返回R.ok()，失败返回R.failed()
-	 */
-	@Override
-	public R checkPassword(String password) {
-		SysUser sysUser = baseMapper.selectById(SecurityUtils.getUser().getId());
-
-		if (!ENCODER.matches(password, sysUser.getPassword())) {
-			log.info("原密码错误");
-			return R.failed("密码输入错误");
-		}
-		else {
-			return R.ok();
-		}
 	}
 
 	// 发送验证码（非框架原有）
@@ -550,7 +358,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 		UserCenterVO vo = new UserCenterVO();
 		vo.setAvatar(sysUser.getAvatar());
 		vo.setName(sysUser.getName());
-		vo.setSex(sysUser.getSex());
 		vo.setUsername(sysUser.getUsername());
 		vo.setPhone(sysUser.getPhone());
 		vo.setSignature(sysUser.getSignature());
@@ -599,8 +406,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 				UserDTO userDTO = new UserDTO();
 				userDTO.setUsername(excel.getUsername()); // 学号
 				userDTO.setName(excel.getName());         // 姓名
-				userDTO.setSex(excel.getSex());           // 性别
-				userDTO.setEmail(excel.getEmail());       // 邮箱
 				userDTO.setPhone(excel.getPhone());       // 手机号
 				userDTO.setEnrollYear(excel.getEnrollYear()); // 入学年份
 
@@ -666,8 +471,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 				UserDTO userDTO = new UserDTO();
 				userDTO.setUsername(excel.getUsername()); // 教工号
 				userDTO.setName(excel.getName());         // 姓名
-				userDTO.setSex(excel.getSex());           // 性别
-				userDTO.setEmail(excel.getEmail());       // 邮箱
 				userDTO.setPhone(excel.getPhone());       // 手机号
 
 				// 核心身份
@@ -689,6 +492,16 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 			return R.failed(errorMessageList);
 		}
 		return R.ok(null, "教师批量导入成功！");
+	}
+
+	@Override
+	public R tempPassword(TempDTO dto){
+		String password = ENCODER.encode(dto.getPassword());
+
+		this.update(Wrappers.<SysUser>lambdaUpdate()
+				.set(SysUser::getPassword, password)
+				.eq(SysUser::getUsername, dto.getUsername()));
+		return R.ok();
 	}
 
 }

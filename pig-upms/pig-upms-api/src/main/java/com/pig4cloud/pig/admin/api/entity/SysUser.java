@@ -61,13 +61,6 @@ public class SysUser implements Serializable {
 	private String password;
 
 	/**
-	 * 随机盐
-	 */
-	@JsonIgnore
-	@Schema(description = "随机盐")
-	private String salt;
-
-	/**
 	 * 创建人
 	 */
 	@TableField(fill = FieldFill.INSERT)
@@ -128,58 +121,10 @@ public class SysUser implements Serializable {
 	private Long deptId;
 
 	/**
-	 * 微信openid
-	 */
-	@Schema(description = "微信openid")
-	private String wxOpenid;
-
-	/**
-	 * 微信小程序openId
-	 */
-	@Schema(description = "微信小程序openid")
-	private String miniOpenid;
-
-	/**
-	 * QQ openid
-	 */
-	@Schema(description = "QQ openid")
-	private String qqOpenid;
-
-	/**
-	 * 码云唯一标识
-	 */
-	@Schema(description = "码云唯一标识")
-	private String giteeLogin;
-
-	/**
-	 * 开源中国唯一标识
-	 */
-	@Schema(description = "开源中国唯一标识")
-	private String oscId;
-
-	/**
-	 * 昵称
-	 */
-	@Schema(description = "昵称")
-	private String nickname;
-
-	/**
 	 * 姓名
 	 */
 	@Schema(description = "姓名")
 	private String name;
-
-	/**
-	 * 邮箱
-	 */
-	@Schema(description = "邮箱")
-	private String email;
-
-	/**
-	 * 性别（非框架原有）
-	 */
-	@Schema(description = "性别")
-	private String sex;
 
 	/**
 	 * 个性签名（非框架原有）

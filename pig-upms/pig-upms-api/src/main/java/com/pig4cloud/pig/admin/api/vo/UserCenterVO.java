@@ -7,28 +7,22 @@ import lombok.Data;
 @Schema(description = "个人中心信息")
 public class UserCenterVO {
 	/**
-	 * 头像URL
-	 */
-	@Schema(description = "头像URL")
-	private String avatar;
-
-	/**
 	 * 姓名
 	 */
 	@Schema(description = "姓名")
 	private String name;
 
 	/**
-	 * 性别
+	 * 头像URL
 	 */
-	@Schema(description = "性别")
-	private String sex;
+	@Schema(description = "头像URL")
+	private String avatar;
 
 	/**
-	 * 学号/教职工号
+	 * 个性签名
 	 */
-	@Schema(description = "学号/教职工号")
-	private String username;
+	@Schema(description = "个性签名")
+	private String signature;
 
 	/**
 	 * 手机号
@@ -37,8 +31,10 @@ public class UserCenterVO {
 	private String phone;
 
 	/**
-	 * 个性签名
+	 * 学号/教职工号
 	 */
-	@Schema(description = "个性签名")
-	private String signature;
+	@Schema(description = "学号/教职工号")
+	private String username;
+
+
 }

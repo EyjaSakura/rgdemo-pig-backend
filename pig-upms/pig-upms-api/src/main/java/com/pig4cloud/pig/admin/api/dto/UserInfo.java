@@ -51,12 +51,6 @@ public class UserInfo extends UserVO implements Serializable {
 	private String password;
 
 	/**
-	 * 随机盐
-	 */
-	@JsonIgnore(value = false)
-	private String salt;
-
-	/**
 	 * 权限标识集合
 	 */
 	@Schema(description = "权限标识集合")

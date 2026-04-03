@@ -19,35 +19,28 @@
 
 package com.pig4cloud.pig.admin.service.impl;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.BindingResult;
-
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.pig4cloud.pig.admin.api.entity.SysDept;
-import com.pig4cloud.pig.admin.api.vo.DeptExcelVo;
-import com.pig4cloud.pig.admin.mapper.SysDeptMapper;
-import com.pig4cloud.pig.admin.service.SysDeptService;
-import com.pig4cloud.pig.common.core.util.R;
-import com.pig4cloud.plugin.excel.vo.ErrorMessage;
-
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.lang.tree.TreeNode;
 import cn.hutool.core.lang.tree.TreeUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.pig4cloud.pig.admin.api.entity.SysDept;
+import com.pig4cloud.pig.admin.mapper.SysDeptMapper;
+import com.pig4cloud.pig.admin.service.SysDeptService;
+import com.pig4cloud.pig.common.core.constant.CacheConstants;
+import com.pig4cloud.pig.common.core.util.R;
+import com.pig4cloud.plugin.excel.vo.ErrorMessage;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
+import org.springframework.cache.annotation.Cacheable;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 部门管理服务实现类
@@ -122,71 +115,6 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
 	}
 
 	/**
-	 * 导出部门列表为Excel视图对象列表
-	 * @return 部门Excel视图对象列表，包含部门名称、父部门名称和排序号
-	 */
-	@Override
-	public List<DeptExcelVo> exportDepts() {
-		List<SysDept> list = this.list();
-		List<DeptExcelVo> deptExcelVos = list.stream().map(item -> {
-			DeptExcelVo deptExcelVo = new DeptExcelVo();
-			deptExcelVo.setName(item.getName());
-			Optional<String> first = this.list()
-				.stream()
-				.filter(it -> item.getParentId().equals(it.getDeptId()))
-				.map(SysDept::getName)
-				.findFirst();
-			deptExcelVo.setParentName(first.orElse("根部门"));
-			deptExcelVo.setSortOrder(item.getSortOrder());
-			return deptExcelVo;
-		}).toList();
-		return deptExcelVos;
-	}
-
-	/**
-	 * 导入部门信息
-	 * @param excelVOList 部门Excel数据列表
-	 * @param bindingResult 数据校验结果
-	 * @return 导入结果，包含错误信息或成功信息
-	 */
-	@Override
-	public R importDept(List<DeptExcelVo> excelVOList, BindingResult bindingResult) {
-		List<ErrorMessage> errorMessageList = (List<ErrorMessage>) bindingResult.getTarget();
-
-		List<SysDept> deptList = this.list();
-		for (DeptExcelVo item : excelVOList) {
-			Set<String> errorMsg = new HashSet<>();
-			boolean exsitUsername = deptList.stream().anyMatch(sysDept -> item.getName().equals(sysDept.getName()));
-			if (exsitUsername) {
-				errorMsg.add("部门名称已经存在");
-			}
-			SysDept one = this.getOne(Wrappers.<SysDept>lambdaQuery().eq(SysDept::getName, item.getParentName()));
-			if (item.getParentName().equals("根部门")) {
-				one = new SysDept();
-				one.setDeptId(0L);
-			}
-			if (one == null) {
-				errorMsg.add("上级部门不存在");
-			}
-			if (CollUtil.isEmpty(errorMsg)) {
-				SysDept sysDept = new SysDept();
-				sysDept.setName(item.getName());
-				sysDept.setParentId(one.getDeptId());
-				sysDept.setSortOrder(item.getSortOrder());
-				baseMapper.insert(sysDept);
-			}
-			else {
-				// 数据不合法情况
-				errorMessageList.add(new ErrorMessage(item.getLineNum(), errorMsg));
-			}
-		}
-		if (CollUtil.isNotEmpty(errorMessageList)) {
-			return R.failed(errorMessageList);
-		}
-		return R.ok(null, "部门导入成功");
-	}
-
-	/**
 	 * 查询部门及其所有子部门
 	 * @param deptId 目标部门ID
 	 * @return 包含目标部门及其所有子部门的列表
@@ -217,6 +145,55 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
 			resDeptList.add(sysDept);
 			recursiveDept(allDeptList, sysDept.getDeptId(), resDeptList);
 		});
+	}
+
+	/**
+	 * 获取全量部门的 Map (利用 Spring Cache 优雅实现 Redis 缓存)
+	 * @return Map<deptId, SysDept>
+	 */
+	@Cacheable(value = "sys_dept", key = "'all_dept_map'")
+	public Map<Long, SysDept> getAllDeptMapFromCache() {
+		// 只有当 Redis 里没有数据时，才会执行到这里查数据库
+		List<SysDept> allDepts = this.list(Wrappers.emptyWrapper());
+		// 转换成 Map 结构，极速寻址
+		return allDepts.stream()
+				.collect(Collectors.toMap(SysDept::getDeptId, dept -> dept));
+	}
+
+	/**
+	 * 获取指定部门的完整层级路径名称 (如: "学校-学院-专业-班级")
+	 * @param targetDeptId 目标节点的 ID (比如班级 ID)
+	 * @return 拼接好的完整路径字符串
+	 */
+	@Override
+	public String getFullDeptPathName(Long targetDeptId) {
+		if (targetDeptId == null) {
+			return "";
+		}
+
+		// 1. 极速获取全局缓存 Map (O(1) 复杂度)
+		Map<Long, SysDept> deptMap = this.getAllDeptMapFromCache();
+
+		List<String> pathNames = new ArrayList<>();
+		Long currentId = targetDeptId;
+
+		// 2. 纯内存自底向上溯源
+		while (currentId != null && currentId != 0L) {
+			SysDept currentDept = deptMap.get(currentId);
+
+			if (currentDept == null) {
+				break; // 防御性编程：防止脏数据导致死循环
+			}
+
+			pathNames.add(currentDept.getName());
+			currentId = currentDept.getParentId();
+		}
+
+		// 3. 结果是倒序的（班级->专业->学院），需要反转
+		Collections.reverse(pathNames);
+
+		// 4. 拼接返回
+		return String.join("-", pathNames);
 	}
 
 }

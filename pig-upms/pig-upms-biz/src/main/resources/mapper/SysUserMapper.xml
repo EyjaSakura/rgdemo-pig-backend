@@ -6,28 +6,18 @@
 		<id column="user_id" property="userId"/>
 		<result column="username" property="username"/>
 		<result column="password" property="password"/>
-		<result column="salt" property="salt"/>
 		<result column="phone" property="phone"/>
 		<result column="avatar" property="avatar"/>
-		<result column="wx_openid" property="wxOpenid"/>
-		<result column="qq_openid" property="qqOpenid"/>
-		<result column="gitee_login" property="giteeOpenId"/>
-		<result column="osc_id" property="oscOpenId"/>
+		<result column="name" property="name"/>
 		<result column="create_time" property="createTime"/>
 		<result column="update_time" property="updateTime"/>
 		<result column="lock_flag" property="lockFlag"/>
 		<result column="del_flag" property="delFlag"/>
-		<result column="nickname" property="nickname"/>
-		<result column="name" property="name"/>
-		<result column="email" property="email"/>
 		<association property="dept" javaType="com.pig4cloud.pig.admin.api.entity.SysDept" column="dept_id"
 					 select="com.pig4cloud.pig.admin.mapper.SysDeptMapper.selectById">
 		</association>
 		<collection property="roleList" ofType="com.pig4cloud.pig.admin.api.entity.SysRole"
 					select="com.pig4cloud.pig.admin.mapper.SysRoleMapper.listRolesByUserId" column="user_id">
-		</collection>
-		<collection property="postList" ofType="com.pig4cloud.pig.admin.api.entity.SysPost"
-					select="com.pig4cloud.pig.admin.mapper.SysPostMapper.listPostsByUserId" column="user_id">
 		</collection>
 	</resultMap>
 
@@ -64,7 +54,7 @@
 		<include refid="userQuerySql"/>
 	</select>
 
-	<!-- 查询用户信息  （单个）-->
+	<!-- 查询用户信息 -->
 	<select id="getUser" resultMap="baseResultMap">
 		SELECT * FROM sys_user u
 		<where>
@@ -83,4 +73,5 @@
 			</if>
 		</where>
 	</select>
+
 </mapper>

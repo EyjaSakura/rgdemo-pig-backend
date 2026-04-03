@@ -18,12 +18,9 @@ package com.pig4cloud.pig.auth.support.handler;
 
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
-import com.pig4cloud.pig.admin.api.entity.SysLog;
 import com.pig4cloud.pig.common.core.constant.CommonConstants;
 import com.pig4cloud.pig.common.core.constant.SecurityConstants;
 import com.pig4cloud.pig.common.core.util.SpringContextHolder;
-import com.pig4cloud.pig.common.log.event.SysLogEvent;
-import com.pig4cloud.pig.common.log.util.SysLogUtils;
 import com.pig4cloud.pig.common.security.component.PigCustomOAuth2AccessTokenResponseHttpMessageConverter;
 import com.pig4cloud.pig.common.security.service.PigUser;
 import jakarta.servlet.http.HttpServletRequest;
@@ -73,16 +70,11 @@ public class PigAuthenticationSuccessEventHandler implements AuthenticationSucce
 			PigUser userInfo = (PigUser) map.get(SecurityConstants.DETAILS_USER);
 			log.info("用户：{} 登录成功", userInfo.getName());
 			SecurityContextHolder.getContext().setAuthentication(accessTokenAuthentication);
-			SysLog logVo = SysLogUtils.getSysLog();
-			logVo.setTitle("登录成功");
 			String startTimeStr = request.getHeader(CommonConstants.REQUEST_START_TIME);
 			if (StrUtil.isNotBlank(startTimeStr)) {
 				Long startTime = Long.parseLong(startTimeStr);
 				Long endTime = System.currentTimeMillis();
-				logVo.setTime(endTime - startTime);
 			}
-			logVo.setCreateBy(userInfo.getName());
-			SpringContextHolder.publishEvent(new SysLogEvent(logVo));
 		}
 
 		// 输出token

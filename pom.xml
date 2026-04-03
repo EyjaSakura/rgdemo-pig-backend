@@ -93,12 +93,10 @@
 	</dependencies>
 
 	<modules>
-		<module>pig-register</module>
 		<module>pig-gateway</module>
 		<module>pig-auth</module>
 		<module>pig-upms</module>
 		<module>pig-common</module>
-		<module>pig-visual</module>
 		<module>eyja-homework-biz</module>
 	</modules>
 
@@ -256,6 +254,12 @@
 					<release>${java.version}</release>
 					<encoding>UTF-8</encoding>
 					<parameters>true</parameters>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>1.18.30</version> </path>
+					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
 			<!--打包jar 与git commit 关联插件-->
@@ -311,12 +315,6 @@
 				<!-- 默认环境 -->
 				<activeByDefault>true</activeByDefault>
 			</activation>
-		</profile>
-		<profile>
-			<id>boot</id>
-			<modules>
-				<module>pig-boot</module>
-			</modules>
 		</profile>
 		<!-- 自动激活，针对 lombok 注解增强-->
 		<profile>

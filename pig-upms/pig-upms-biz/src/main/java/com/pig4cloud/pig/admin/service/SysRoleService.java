@@ -21,7 +21,6 @@ package com.pig4cloud.pig.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.pig4cloud.pig.admin.api.entity.SysRole;
-import com.pig4cloud.pig.admin.api.vo.RoleExcelVO;
 import com.pig4cloud.pig.admin.api.vo.RoleVO;
 import com.pig4cloud.pig.common.core.util.R;
 import org.springframework.validation.BindingResult;
@@ -67,19 +66,5 @@ public interface SysRoleService extends IService<SysRole> {
 	 * @return 更新是否成功
 	 */
 	Boolean updateRoleMenus(RoleVO roleVo);
-
-	/**
-	 * 导入角色
-	 * @param excelVOList 角色列表
-	 * @param bindingResult 错误信息列表
-	 * @return 导入结果
-	 */
-	R importRole(List<RoleExcelVO> excelVOList, BindingResult bindingResult);
-
-	/**
-	 * 查询全部角色列表
-	 * @return 角色列表，包含角色Excel视图对象
-	 */
-	List<RoleExcelVO> listRoles();
 
 }

@@ -21,7 +21,6 @@ package com.pig4cloud.pig.admin.api.vo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pig4cloud.pig.admin.api.entity.SysDept;
-import com.pig4cloud.pig.admin.api.entity.SysPost;
 import com.pig4cloud.pig.admin.api.entity.SysRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -57,36 +56,6 @@ public class UserVO implements Serializable {
 	 */
 	@JsonIgnore
 	private String password;
-
-	/**
-	 * 随机盐
-	 */
-	@JsonIgnore
-	private String salt;
-
-	/**
-	 * 微信openid
-	 */
-	@Schema(description = "微信open id")
-	private String wxOpenid;
-
-	/**
-	 * QQ openid
-	 */
-	@Schema(description = "qq open id")
-	private String qqOpenid;
-
-	/**
-	 * gitee openid
-	 */
-	@Schema(description = "gitee open id")
-	private String giteeOpenId;
-
-	/**
-	 * 开源中国 openid
-	 */
-	@Schema(description = "开源中国 open id")
-	private String oscOpenId;
 
 	/**
 	 * 创建时间
@@ -131,32 +100,21 @@ public class UserVO implements Serializable {
 	private SysDept dept;
 
 	/**
+	 * 部门层级结构
+	 */
+	@Schema(description = "部门层级结构")
+	private String fullName;
+
+	/**
 	 * 角色列表
 	 */
 	@Schema(description = "拥有的角色列表")
 	private List<SysRole> roleList;
 
 	/**
-	 * 岗位列表
-	 */
-	private List<SysPost> postList;
-
-	/**
-	 * 昵称
-	 */
-	@Schema(description = "昵称")
-	private String nickname;
-
-	/**
 	 * 姓名
 	 */
 	@Schema(description = "姓名")
 	private String name;
-
-	/**
-	 * 邮箱
-	 */
-	@Schema(description = "邮箱")
-	private String email;
 
 }
