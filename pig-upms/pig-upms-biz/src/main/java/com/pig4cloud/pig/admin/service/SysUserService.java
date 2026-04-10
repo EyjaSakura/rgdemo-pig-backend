@@ -131,5 +131,5 @@ public interface SysUserService extends IService<SysUser> {
 	// @return 导入结果
 	R importTeachers(List<TeacherExcelDTO> excelVOList, BindingResult bindingResult);
 
-	public R tempPassword(TempDTO dto);
+	R tempPassword(TempDTO dto);
 }

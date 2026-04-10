@@ -13,6 +13,9 @@
 		<result column="update_time" property="updateTime"/>
 		<result column="lock_flag" property="lockFlag"/>
 		<result column="del_flag" property="delFlag"/>
+		<result column="signature" property="signature"/>
+		<result column="enroll_year" property="enrollYear"/>
+		<result column="user_type" property="userType"/>
 		<association property="dept" javaType="com.pig4cloud.pig.admin.api.entity.SysDept" column="dept_id"
 					 select="com.pig4cloud.pig.admin.mapper.SysDeptMapper.selectById">
 		</association>

@@ -141,6 +141,6 @@ public class SysUser implements Serializable {
 	/**
 	 * 用户类型（非框架原有）
 	 */
-	@Schema(description = "用户类型")
+	@Schema(description = "用户类型：adm管理员 tch教师 stu学生，可扩展")
 	private String userType;
 }

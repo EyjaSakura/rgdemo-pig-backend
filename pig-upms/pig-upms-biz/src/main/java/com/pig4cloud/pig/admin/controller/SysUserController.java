@@ -106,18 +106,14 @@ public class SysUserController {
 	 * @return 包含查询结果的响应对象，用户不存在时返回null
 	 */
 	@Inner(value = false)
-	@GetMapping("/details")
+	@PostMapping("/details")
 	@Operation(summary = "查询用户详细信息", description = "查询用户详细信息")
 	public R getDetails(@RequestBody UserDetailsDTO dto) {
-		// 1. 参数校验
-//		if (StringUtils.isAllBlank(dto.getUserId(), dto.getUsername(),
-//				dto.getPhone(), dto.getDeptId())) {
-//			return R.failed("至少需要一个查询条件");
-//		}
-
 		UserDTO userDTO = new UserDTO();
 		BeanUtils.copyProperties(dto, userDTO);
-		return R.ok(userService.getUserInfo(userDTO));
+		// 直接返回 getUserInfo 的结果，不要再包一层 R.ok()
+		// getUserInfo 内部已处理：用户存在返回 R.ok(userInfo)，不存在返回 R.failed()
+		return userService.getUserInfo(userDTO);
 	}
 
 	/**
@@ -125,7 +121,6 @@ public class SysUserController {
 	 * @param ids 用户ID数组
 	 * @return 操作结果
 	 */
-	
 	@DeleteMapping
 	@HasPermission("sys_user_del")
 	@Operation(summary = "根据ID删除用户", description = "根据ID删除用户")
@@ -133,12 +128,6 @@ public class SysUserController {
 		return R.ok(userService.removeUserByIds(ids));
 	}
 
-	/**
-	 * 添加用户
-	 * @param userDto 用户信息DTO
-	 * @return 操作结果，成功返回success，失败返回false
-	 */
-	
 	@PostMapping
 	@HasPermission("sys_user_add")
 	@Operation(summary = "添加用户", description = "添加用户")
@@ -146,12 +135,6 @@ public class SysUserController {
 		return R.ok(userService.saveUser(userDto));
 	}
 
-	/**
-	 * 更新用户信息
-	 * @param userDto 用户信息DTO对象
-	 * @return 包含操作结果的R对象
-	 */
-	
 	@PutMapping
 	@HasPermission("sys_user_edit")
 	@Operation(summary = "更新用户信息", description = "更新用户信息")
@@ -171,12 +154,27 @@ public class SysUserController {
 		return R.ok(userService.getUsersWithRolePage(page, userDTO));
 	}
 
+	// 这个不是框架原有的
+	// 按 userType / deptId 轻量查询用户列表（用于创建任课时选择教师下拉框等场景）
+
+	@GetMapping("/list")
+	@Operation(summary = "按条件查询用户列表（轻量）", description = "支持 userType、deptId 过滤，返回 id+name+username，用于下拉选择")
+	public R listUsers(@ParameterObject UserDTO userDTO) {
+		return R.ok(userService.list(com.baomidou.mybatisplus.core.toolkit.Wrappers.<com.pig4cloud.pig.admin.api.entity.SysUser>lambdaQuery()
+				.eq(userDTO.getUserType() != null, com.pig4cloud.pig.admin.api.entity.SysUser::getUserType, userDTO.getUserType())
+				.eq(userDTO.getDeptId() != null, com.pig4cloud.pig.admin.api.entity.SysUser::getDeptId, userDTO.getDeptId())
+				.select(com.pig4cloud.pig.admin.api.entity.SysUser::getUserId,
+						com.pig4cloud.pig.admin.api.entity.SysUser::getName,
+						com.pig4cloud.pig.admin.api.entity.SysUser::getUsername,
+						com.pig4cloud.pig.admin.api.entity.SysUser::getUserType,
+						com.pig4cloud.pig.admin.api.entity.SysUser::getDeptId)));
+	}
+
 	/**
 	 * 修改个人信息
 	 * @param userDto 用户信息传输对象
 	 * @return 操作结果，成功返回success，失败返回false
 	 */
-	
 	@PutMapping("/edit")
 	@Operation(summary = "修改个人信息", description = "修改个人信息")
 	public R updateUserInfo(@Valid @RequestBody UserDTO userDto) {
@@ -286,7 +284,7 @@ public class SysUserController {
 		// 查出该班级所有学生
 		List<SysUser> studentList = userService.list(Wrappers.<SysUser>lambdaQuery()
 				.eq(SysUser::getDeptId, deptId)
-				.eq(SysUser::getUserType, "3"));
+				.eq(SysUser::getUserType, "stu"));
 
 		// 提取出 ID 列表
 		List<Long> ids = studentList.stream().map(SysUser::getUserId).collect(Collectors.toList());

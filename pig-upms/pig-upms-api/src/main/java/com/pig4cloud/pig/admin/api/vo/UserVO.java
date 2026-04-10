@@ -117,4 +117,22 @@ public class UserVO implements Serializable {
 	@Schema(description = "姓名")
 	private String name;
 
+	/**
+	 * 个性签名（非框架原有）
+	 */
+	@Schema(description = "个性签名")
+	private String signature;
+
+	/**
+	 * 入学年份（非框架原有）
+	 */
+	@Schema(description = "入学年份")
+	private String enrollYear;
+
+	/**
+	 * 用户类型（非框架原有，1管理 2教师 3学生）
+	 */
+	@Schema(description = "用户类型：adm管理员 tch教师 stu学生，可扩展")
+	private String userType;
+
 }

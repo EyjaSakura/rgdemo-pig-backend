@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.pig4cloud.pig.homework.mapper.BizTeachingMapper">
+
+  <resultMap id="BaseResultMap" type="com.pig4cloud.pig.homework.entity.BizTeaching">
+    <id column="teaching_id" jdbcType="BIGINT" property="teachingId"/>
+    <result column="course_code" jdbcType="VARCHAR" property="courseCode"/>
+    <result column="teach_year" jdbcType="INTEGER" property="teachYear"/>
+    <result column="class_no" jdbcType="VARCHAR" property="classNo"/>
+    <result column="teacher_id" jdbcType="BIGINT" property="teacherId"/>
+    <result column="college_id" jdbcType="BIGINT" property="collegeId"/>
+    <result column="max_students" jdbcType="INTEGER" property="maxStudents"/>
+    <result column="time_place" jdbcType="VARCHAR" property="timePlace"/>
+    <result column="status" jdbcType="CHAR" property="status"/>
+    <result column="enrolled_count" jdbcType="INTEGER" property="enrolledCount"/>
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    <result column="del_flag" jdbcType="CHAR" property="delFlag"/>
+  </resultMap>
+  <sql id="Base_Column_List">
+    teaching_id, course_code, teach_year, class_no, teacher_id, college_id, max_students, 
+	time_place, status, enrolled_count, create_time, update_time, del_flag
+  </sql>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from biz_teaching
+    where teaching_id = #{teachingId,jdbcType=BIGINT}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from biz_teaching
+    where teaching_id = #{teachingId,jdbcType=BIGINT}
+  </delete>
+
+  <insert id="insert" parameterType="com.pig4cloud.pig.homework.entity.BizTeaching">
+    <selectKey keyProperty="teachingId" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into biz_teaching(course_code, teach_year, class_no, 
+	 teacher_id, college_id, max_students, time_place, 
+	 status, enrolled_count, create_time, update_time, 
+	 del_flag)
+    values (#{courseCode,jdbcType=VARCHAR}, #{teachYear,jdbcType=INTEGER}, #{classNo,jdbcType=VARCHAR}, 
+	 #{teacherId,jdbcType=BIGINT}, #{collegeId,jdbcType=BIGINT}, #{maxStudents,jdbcType=INTEGER}, #{timePlace,jdbcType=VARCHAR}, 
+	 #{status,jdbcType=CHAR}, #{enrolledCount,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+	 #{delFlag,jdbcType=CHAR})
+  </insert>
+
+  <insert id="insertSelective" parameterType="com.pig4cloud.pig.homework.entity.BizTeaching">
+    <selectKey keyProperty="teachingId" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into biz_teaching
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="courseCode != null">
+        course_code,
+      </if>
+      <if test="teachYear != null">
+        teach_year,
+      </if>
+      <if test="classNo != null">
+        class_no,
+      </if>
+      <if test="teacherId != null">
+        teacher_id,
+      </if>
+      <if test="collegeId != null">
+        college_id,
+      </if>
+      <if test="maxStudents != null">
+        max_students,
+      </if>
+      <if test="timePlace != null">
+        time_place,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="enrolledCount != null">
+        enrolled_count,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="delFlag != null">
+        del_flag,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="courseCode != null">
+        #{courseCode,jdbcType=VARCHAR},
+      </if>
+      <if test="teachYear != null">
+        #{teachYear,jdbcType=INTEGER},
+      </if>
+      <if test="classNo != null">
+        #{classNo,jdbcType=VARCHAR},
+      </if>
+      <if test="teacherId != null">
+        #{teacherId,jdbcType=BIGINT},
+      </if>
+      <if test="collegeId != null">
+        #{collegeId,jdbcType=BIGINT},
+      </if>
+      <if test="maxStudents != null">
+        #{maxStudents,jdbcType=INTEGER},
+      </if>
+      <if test="timePlace != null">
+        #{timePlace,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=CHAR},
+      </if>
+      <if test="enrolledCount != null">
+        #{enrolledCount,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="delFlag != null">
+        #{delFlag,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.pig4cloud.pig.homework.entity.BizTeaching">
+    update biz_teaching
+    <set>
+      <if test="courseCode != null">
+        course_code = #{courseCode,jdbcType=VARCHAR},
+      </if>
+      <if test="teachYear != null">
+        teach_year = #{teachYear,jdbcType=INTEGER},
+      </if>
+      <if test="classNo != null">
+        class_no = #{classNo,jdbcType=VARCHAR},
+      </if>
+      <if test="teacherId != null">
+        teacher_id = #{teacherId,jdbcType=BIGINT},
+      </if>
+      <if test="collegeId != null">
+        college_id = #{collegeId,jdbcType=BIGINT},
+      </if>
+      <if test="maxStudents != null">
+        max_students = #{maxStudents,jdbcType=INTEGER},
+      </if>
+      <if test="timePlace != null">
+        time_place = #{timePlace,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=CHAR},
+      </if>
+      <if test="enrolledCount != null">
+        enrolled_count = #{enrolledCount,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="delFlag != null">
+        del_flag = #{delFlag,jdbcType=CHAR},
+      </if>
+    </set>
+    where teaching_id = #{teachingId,jdbcType=BIGINT}
+  </update>
+
+  <update id="updateByPrimaryKey" parameterType="com.pig4cloud.pig.homework.entity.BizTeaching">
+    update biz_teaching
+    set course_code = #{courseCode,jdbcType=VARCHAR},
+	  teach_year = #{teachYear,jdbcType=INTEGER},
+	  class_no = #{classNo,jdbcType=VARCHAR},
+	  teacher_id = #{teacherId,jdbcType=BIGINT},
+	  college_id = #{collegeId,jdbcType=BIGINT},
+	  max_students = #{maxStudents,jdbcType=INTEGER},
+	  time_place = #{timePlace,jdbcType=VARCHAR},
+	  status = #{status,jdbcType=CHAR},
+	  enrolled_count = #{enrolledCount,jdbcType=INTEGER},
+	  create_time = #{createTime,jdbcType=TIMESTAMP},
+	  update_time = #{updateTime,jdbcType=TIMESTAMP},
+	  del_flag = #{delFlag,jdbcType=CHAR}
+    where teaching_id = #{teachingId,jdbcType=BIGINT}
+  </update>
+</mapper>

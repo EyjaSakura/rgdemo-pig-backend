@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.pig4cloud.pig.homework.mapper.BizAuditLogMapper">
+
+  <resultMap id="BaseResultMap" type="com.pig4cloud.pig.homework.entity.BizAuditLog">
+    <id column="log_id" jdbcType="BIGINT" property="logId"/>
+    <result column="user_id" jdbcType="BIGINT" property="userId"/>
+    <result column="username" jdbcType="VARCHAR" property="username"/>
+    <result column="module" jdbcType="VARCHAR" property="module"/>
+    <result column="action" jdbcType="VARCHAR" property="action"/>
+    <result column="ip" jdbcType="VARCHAR" property="ip"/>
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.pig4cloud.pig.homework.entity.BizAuditLog">
+    <result column="detail" jdbcType="LONGVARCHAR" property="detail"/>
+  </resultMap>
+  <sql id="Base_Column_List">
+    log_id, user_id, username, module, action, ip, create_time
+  </sql>
+  <sql id="Blob_Column_List">
+    detail
+  </sql>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
+    select
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from biz_audit_log
+    where log_id = #{logId,jdbcType=BIGINT}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from biz_audit_log
+    where log_id = #{logId,jdbcType=BIGINT}
+  </delete>
+
+  <insert id="insert" parameterType="com.pig4cloud.pig.homework.entity.BizAuditLog">
+    <selectKey keyProperty="logId" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into biz_audit_log(user_id, username, module, 
+	 action, detail, ip, create_time)
+    values (#{userId,jdbcType=BIGINT}, #{username,jdbcType=VARCHAR}, #{module,jdbcType=VARCHAR}, 
+	 #{action,jdbcType=VARCHAR}, #{detail,jdbcType=LONGVARCHAR}, #{ip,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+
+  <insert id="insertSelective" parameterType="com.pig4cloud.pig.homework.entity.BizAuditLog">
+    <selectKey keyProperty="logId" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into biz_audit_log
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="username != null">
+        username,
+      </if>
+      <if test="module != null">
+        module,
+      </if>
+      <if test="action != null">
+        action,
+      </if>
+      <if test="detail != null">
+        detail,
+      </if>
+      <if test="ip != null">
+        ip,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="userId != null">
+        #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="username != null">
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="module != null">
+        #{module,jdbcType=VARCHAR},
+      </if>
+      <if test="action != null">
+        #{action,jdbcType=VARCHAR},
+      </if>
+      <if test="detail != null">
+        #{detail,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="ip != null">
+        #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.pig4cloud.pig.homework.entity.BizAuditLog">
+    update biz_audit_log
+    <set>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="username != null">
+        username = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="module != null">
+        module = #{module,jdbcType=VARCHAR},
+      </if>
+      <if test="action != null">
+        action = #{action,jdbcType=VARCHAR},
+      </if>
+      <if test="detail != null">
+        detail = #{detail,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="ip != null">
+        ip = #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where log_id = #{logId,jdbcType=BIGINT}
+  </update>
+
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.pig4cloud.pig.homework.entity.BizAuditLog">
+    update biz_audit_log
+    set user_id = #{userId,jdbcType=BIGINT},
+	  username = #{username,jdbcType=VARCHAR},
+	  module = #{module,jdbcType=VARCHAR},
+	  action = #{action,jdbcType=VARCHAR},
+	  detail = #{detail,jdbcType=LONGVARCHAR},
+	  ip = #{ip,jdbcType=VARCHAR},
+	  create_time = #{createTime,jdbcType=TIMESTAMP}
+    where log_id = #{logId,jdbcType=BIGINT}
+  </update>
+
+  <update id="updateByPrimaryKey" parameterType="com.pig4cloud.pig.homework.entity.BizAuditLog">
+    update biz_audit_log
+    set user_id = #{userId,jdbcType=BIGINT},
+	  username = #{username,jdbcType=VARCHAR},
+	  module = #{module,jdbcType=VARCHAR},
+	  action = #{action,jdbcType=VARCHAR},
+	  ip = #{ip,jdbcType=VARCHAR},
+	  create_time = #{createTime,jdbcType=TIMESTAMP}
+    where log_id = #{logId,jdbcType=BIGINT}
+  </update>
+</mapper>

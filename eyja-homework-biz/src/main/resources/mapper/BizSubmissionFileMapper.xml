@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.pig4cloud.pig.homework.mapper.BizSubmissionFileMapper">
+
+  <resultMap id="BaseResultMap" type="com.pig4cloud.pig.homework.entity.BizSubmissionFile">
+    <id column="file_id" jdbcType="BIGINT" property="fileId"/>
+    <result column="submission_id" jdbcType="BIGINT" property="submissionId"/>
+    <result column="file_name" jdbcType="VARCHAR" property="fileName"/>
+    <result column="file_url" jdbcType="VARCHAR" property="fileUrl"/>
+    <result column="file_size" jdbcType="BIGINT" property="fileSize"/>
+    <result column="upload_time" jdbcType="TIMESTAMP" property="uploadTime"/>
+    <result column="del_flag" jdbcType="CHAR" property="delFlag"/>
+  </resultMap>
+  <sql id="Base_Column_List">
+    file_id, submission_id, file_name, file_url, file_size, upload_time, del_flag
+  </sql>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from biz_submission_file
+    where file_id = #{fileId,jdbcType=BIGINT}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from biz_submission_file
+    where file_id = #{fileId,jdbcType=BIGINT}
+  </delete>
+
+  <insert id="insert" parameterType="com.pig4cloud.pig.homework.entity.BizSubmissionFile">
+    <selectKey keyProperty="fileId" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into biz_submission_file(submission_id, file_name, file_url, 
+	 file_size, upload_time, del_flag)
+    values (#{submissionId,jdbcType=BIGINT}, #{fileName,jdbcType=VARCHAR}, #{fileUrl,jdbcType=VARCHAR}, 
+	 #{fileSize,jdbcType=BIGINT}, #{uploadTime,jdbcType=TIMESTAMP}, #{delFlag,jdbcType=CHAR})
+  </insert>
+
+  <insert id="insertSelective" parameterType="com.pig4cloud.pig.homework.entity.BizSubmissionFile">
+    <selectKey keyProperty="fileId" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into biz_submission_file
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="submissionId != null">
+        submission_id,
+      </if>
+      <if test="fileName != null">
+        file_name,
+      </if>
+      <if test="fileUrl != null">
+        file_url,
+      </if>
+      <if test="fileSize != null">
+        file_size,
+      </if>
+      <if test="uploadTime != null">
+        upload_time,
+      </if>
+      <if test="delFlag != null">
+        del_flag,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="submissionId != null">
+        #{submissionId,jdbcType=BIGINT},
+      </if>
+      <if test="fileName != null">
+        #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="fileUrl != null">
+        #{fileUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="fileSize != null">
+        #{fileSize,jdbcType=BIGINT},
+      </if>
+      <if test="uploadTime != null">
+        #{uploadTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="delFlag != null">
+        #{delFlag,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.pig4cloud.pig.homework.entity.BizSubmissionFile">
+    update biz_submission_file
+    <set>
+      <if test="submissionId != null">
+        submission_id = #{submissionId,jdbcType=BIGINT},
+      </if>
+      <if test="fileName != null">
+        file_name = #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="fileUrl != null">
+        file_url = #{fileUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="fileSize != null">
+        file_size = #{fileSize,jdbcType=BIGINT},
+      </if>
+      <if test="uploadTime != null">
+        upload_time = #{uploadTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="delFlag != null">
+        del_flag = #{delFlag,jdbcType=CHAR},
+      </if>
+    </set>
+    where file_id = #{fileId,jdbcType=BIGINT}
+  </update>
+
+  <update id="updateByPrimaryKey" parameterType="com.pig4cloud.pig.homework.entity.BizSubmissionFile">
+    update biz_submission_file
+    set submission_id = #{submissionId,jdbcType=BIGINT},
+	  file_name = #{fileName,jdbcType=VARCHAR},
+	  file_url = #{fileUrl,jdbcType=VARCHAR},
+	  file_size = #{fileSize,jdbcType=BIGINT},
+	  upload_time = #{uploadTime,jdbcType=TIMESTAMP},
+	  del_flag = #{delFlag,jdbcType=CHAR}
+    where file_id = #{fileId,jdbcType=BIGINT}
+  </update>
+</mapper>

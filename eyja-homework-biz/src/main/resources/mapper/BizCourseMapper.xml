@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.pig4cloud.pig.homework.mapper.BizCourseMapper">
+
+  <resultMap id="BaseResultMap" type="com.pig4cloud.pig.homework.entity.BizCourse">
+    <id column="course_code" jdbcType="VARCHAR" property="courseCode"/>
+    <result column="college_id" jdbcType="BIGINT" property="collegeId"/>
+    <result column="course_name" jdbcType="VARCHAR" property="courseName"/>
+    <result column="credit" jdbcType="DECIMAL" property="credit"/>
+    <result column="total_hours" jdbcType="INTEGER" property="totalHours"/>
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    <result column="del_flag" jdbcType="CHAR" property="delFlag"/>
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.pig4cloud.pig.homework.entity.BizCourse">
+    <result column="description" jdbcType="LONGVARCHAR" property="description"/>
+  </resultMap>
+  <sql id="Base_Column_List">
+    course_code, college_id, course_name, credit, total_hours, create_time, update_time, 
+	del_flag
+  </sql>
+  <sql id="Blob_Column_List">
+    description
+  </sql>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
+    select
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from biz_course
+    where course_code = #{courseCode,jdbcType=VARCHAR}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from biz_course
+    where course_code = #{courseCode,jdbcType=VARCHAR}
+  </delete>
+
+  <insert id="insert" parameterType="com.pig4cloud.pig.homework.entity.BizCourse">
+    insert into biz_course(course_code, college_id, course_name, credit, 
+	 total_hours, description, create_time, update_time, 
+	 del_flag)
+    values (#{courseCode,jdbcType=VARCHAR}, #{collegeId,jdbcType=BIGINT}, #{courseName,jdbcType=VARCHAR}, #{credit,jdbcType=DECIMAL}, 
+	 #{totalHours,jdbcType=INTEGER}, #{description,jdbcType=LONGVARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+	 #{delFlag,jdbcType=CHAR})
+  </insert>
+
+  <insert id="insertSelective" parameterType="com.pig4cloud.pig.homework.entity.BizCourse">
+    insert into biz_course
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="courseCode != null">
+        course_code,
+      </if>
+      <if test="collegeId != null">
+        college_id,
+      </if>
+      <if test="courseName != null">
+        course_name,
+      </if>
+      <if test="credit != null">
+        credit,
+      </if>
+      <if test="totalHours != null">
+        total_hours,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="delFlag != null">
+        del_flag,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="courseCode != null">
+        #{courseCode,jdbcType=VARCHAR},
+      </if>
+      <if test="collegeId != null">
+        #{collegeId,jdbcType=BIGINT},
+      </if>
+      <if test="courseName != null">
+        #{courseName,jdbcType=VARCHAR},
+      </if>
+      <if test="credit != null">
+        #{credit,jdbcType=DECIMAL},
+      </if>
+      <if test="totalHours != null">
+        #{totalHours,jdbcType=INTEGER},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="delFlag != null">
+        #{delFlag,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.pig4cloud.pig.homework.entity.BizCourse">
+    update biz_course
+    <set>
+      <if test="collegeId != null">
+        college_id = #{collegeId,jdbcType=BIGINT},
+      </if>
+      <if test="courseName != null">
+        course_name = #{courseName,jdbcType=VARCHAR},
+      </if>
+      <if test="credit != null">
+        credit = #{credit,jdbcType=DECIMAL},
+      </if>
+      <if test="totalHours != null">
+        total_hours = #{totalHours,jdbcType=INTEGER},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="delFlag != null">
+        del_flag = #{delFlag,jdbcType=CHAR},
+      </if>
+    </set>
+    where course_code = #{courseCode,jdbcType=VARCHAR}
+  </update>
+
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.pig4cloud.pig.homework.entity.BizCourse">
+    update biz_course
+    set college_id = #{collegeId,jdbcType=BIGINT},
+	  course_name = #{courseName,jdbcType=VARCHAR},
+	  credit = #{credit,jdbcType=DECIMAL},
+	  total_hours = #{totalHours,jdbcType=INTEGER},
+	  description = #{description,jdbcType=LONGVARCHAR},
+	  create_time = #{createTime,jdbcType=TIMESTAMP},
+	  update_time = #{updateTime,jdbcType=TIMESTAMP},
+	  del_flag = #{delFlag,jdbcType=CHAR}
+    where course_code = #{courseCode,jdbcType=VARCHAR}
+  </update>
+
+  <update id="updateByPrimaryKey" parameterType="com.pig4cloud.pig.homework.entity.BizCourse">
+    update biz_course
+    set college_id = #{collegeId,jdbcType=BIGINT},
+	  course_name = #{courseName,jdbcType=VARCHAR},
+	  credit = #{credit,jdbcType=DECIMAL},
+	  total_hours = #{totalHours,jdbcType=INTEGER},
+	  create_time = #{createTime,jdbcType=TIMESTAMP},
+	  update_time = #{updateTime,jdbcType=TIMESTAMP},
+	  del_flag = #{delFlag,jdbcType=CHAR}
+    where course_code = #{courseCode,jdbcType=VARCHAR}
+  </update>
+</mapper>

@@ -73,7 +73,7 @@ import java.util.concurrent.TimeUnit;
 public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> implements SysUserService {
 
 	// redis（非框架原有）
-	private RedisTemplate redisTemplate;
+	private RedisTemplate<String, String> redisTemplate;
 
 	private static final PasswordEncoder ENCODER = new BCryptPasswordEncoder();
 
@@ -98,6 +98,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 	public Boolean saveUser(UserDTO userDto) {
 		SysUser sysUser = new SysUser();
 		BeanUtils.copyProperties(userDto, sysUser);
+		// 空字符串转null，避免整数字段写入空字符串报错（如 enroll_year）
+		if (StrUtil.isBlank(sysUser.getEnrollYear())) {
+			sysUser.setEnrollYear(null);
+		}
 		sysUser.setDelFlag(CommonConstants.STATUS_NORMAL);
 		sysUser.setCreateBy(userDto.getUsername());
 		sysUser.setPassword(ENCODER.encode(userDto.getPassword()));
@@ -223,7 +227,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 		// 更新用户表信息
 		SysUser sysUser = new SysUser();
 		BeanUtils.copyProperties(userDto, sysUser);
-		sysUser.setUpdateTime(LocalDateTime.now());
+		// updateTime 已通过 @TableField(fill=UPDATE) 自动填充，无需手动设置
 		if (StrUtil.isNotBlank(userDto.getPassword())) {
 			sysUser.setPassword(ENCODER.encode(userDto.getPassword()));
 		}
@@ -295,20 +299,20 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
 	// 发送验证码（非框架原有）
 	@Override
-	public R sendResetCode(String phone){
+	public R sendResetCode(String phone) {
 		SysUser sysUser = baseMapper.selectOne(Wrappers.<SysUser>query().lambda().eq(SysUser::getPhone, phone));
 		if (sysUser == null) {
-			return R.failed(null,"手机号错误，该用户不存在！");
+			return R.failed(null, "手机号错误，该用户不存在！");
 		}
 
 		String code = RandomUtil.randomNumbers(6);
 		String redisKey = "RESET_PWD:" + phone;
 		redisTemplate.opsForValue().set(redisKey, code, 5, TimeUnit.MINUTES);
 
-		System.out.println("====== 模拟发送短信 ======");
-		System.out.println("您的验证码是：" + code + "，有效期5分钟。");
+		// 生产环境替换为真实短信服务
+		log.info("====== 模拟发送短信 ====== 手机号: {}, 验证码: {}", phone, code);
 
-		// 测试阶段直接返回
+		// 测试阶段：直接在响应中返回验证码（上线前务必移除 code 字段，仅返回成功提示）
 		return R.ok(code, "验证码发送成功，请注意查收！");
 	}
 
@@ -316,12 +320,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 	@Override
 	public R resetPasswordByPhone(ResetPwdDTO dto){
 		String redisKey = "RESET_PWD:" + dto.getPhone();
-		Object storedCode = redisTemplate.opsForValue().get(redisKey);
+		String storedCode = redisTemplate.opsForValue().get(redisKey);
 
 		if (storedCode == null) {
 			return R.failed("验证码已过期，请重新获取");
 		}
-		if (!storedCode.toString().equals(dto.getCode())) {
+		if (!storedCode.equals(dto.getCode())) {
 			return R.failed("验证码错误");
 		}
 
@@ -361,6 +365,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 		vo.setUsername(sysUser.getUsername());
 		vo.setPhone(sysUser.getPhone());
 		vo.setSignature(sysUser.getSignature());
+		vo.setUserType(sysUser.getUserType());
+		vo.setDeptId(sysUser.getDeptId());
 
 		return vo;
 	}
@@ -411,7 +417,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
 				// 核心身份
 				userDTO.setDeptId(classDept.get().getDeptId()); // 关联真实的班级 ID
-				userDTO.setUserType("3");                       // 身份标识为学生 (1管理 2教师 3学生)
+				userDTO.setUserType("stu");                       // 身份标识为学生 (adm管理 tch教师 stu学生)
 				userDTO.setPassword("666666");                  // 强制初始化密码
 				userDTO.setRole(Collections.singletonList(studentRole.getRoleId())); // 绑定学生角色
 
@@ -475,7 +481,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
 				// 核心身份
 				userDTO.setDeptId(collegeDept.get().getDeptId()); // 关联真实的学院 ID
-				userDTO.setUserType("2");                       // 身份标识为教师 (1管理 2教师 3学生)
+				userDTO.setUserType("tch");                       // 身份标识为教师 (adm管理 tch教师 stu学生)
 				userDTO.setPassword("777777");                  // 强制初始化密码
 				userDTO.setRole(Collections.singletonList(teacherRole.getRoleId())); // 绑定学生角色
 

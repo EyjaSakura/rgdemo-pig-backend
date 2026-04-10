@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.pig4cloud.pig.homework.mapper.BizLearningRecordMapper">
+
+  <resultMap id="BaseResultMap" type="com.pig4cloud.pig.homework.entity.BizLearningRecord">
+    <id column="record_id" jdbcType="BIGINT" property="recordId"/>
+    <result column="student_id" jdbcType="BIGINT" property="studentId"/>
+    <result column="teaching_id" jdbcType="BIGINT" property="teachingId"/>
+    <result column="action_type" jdbcType="CHAR" property="actionType"/>
+    <result column="resource_id" jdbcType="BIGINT" property="resourceId"/>
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+  </resultMap>
+  <sql id="Base_Column_List">
+    record_id, student_id, teaching_id, action_type, resource_id, create_time
+  </sql>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from biz_learning_record
+    where record_id = #{recordId,jdbcType=BIGINT}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from biz_learning_record
+    where record_id = #{recordId,jdbcType=BIGINT}
+  </delete>
+
+  <insert id="insert" parameterType="com.pig4cloud.pig.homework.entity.BizLearningRecord">
+    <selectKey keyProperty="recordId" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into biz_learning_record(student_id, teaching_id, action_type, 
+	 resource_id, create_time)
+    values (#{studentId,jdbcType=BIGINT}, #{teachingId,jdbcType=BIGINT}, #{actionType,jdbcType=CHAR}, 
+	 #{resourceId,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+
+  <insert id="insertSelective" parameterType="com.pig4cloud.pig.homework.entity.BizLearningRecord">
+    <selectKey keyProperty="recordId" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into biz_learning_record
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="studentId != null">
+        student_id,
+      </if>
+      <if test="teachingId != null">
+        teaching_id,
+      </if>
+      <if test="actionType != null">
+        action_type,
+      </if>
+      <if test="resourceId != null">
+        resource_id,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="studentId != null">
+        #{studentId,jdbcType=BIGINT},
+      </if>
+      <if test="teachingId != null">
+        #{teachingId,jdbcType=BIGINT},
+      </if>
+      <if test="actionType != null">
+        #{actionType,jdbcType=CHAR},
+      </if>
+      <if test="resourceId != null">
+        #{resourceId,jdbcType=BIGINT},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.pig4cloud.pig.homework.entity.BizLearningRecord">
+    update biz_learning_record
+    <set>
+      <if test="studentId != null">
+        student_id = #{studentId,jdbcType=BIGINT},
+      </if>
+      <if test="teachingId != null">
+        teaching_id = #{teachingId,jdbcType=BIGINT},
+      </if>
+      <if test="actionType != null">
+        action_type = #{actionType,jdbcType=CHAR},
+      </if>
+      <if test="resourceId != null">
+        resource_id = #{resourceId,jdbcType=BIGINT},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where record_id = #{recordId,jdbcType=BIGINT}
+  </update>
+
+  <update id="updateByPrimaryKey" parameterType="com.pig4cloud.pig.homework.entity.BizLearningRecord">
+    update biz_learning_record
+    set student_id = #{studentId,jdbcType=BIGINT},
+	  teaching_id = #{teachingId,jdbcType=BIGINT},
+	  action_type = #{actionType,jdbcType=CHAR},
+	  resource_id = #{resourceId,jdbcType=BIGINT},
+	  create_time = #{createTime,jdbcType=TIMESTAMP}
+    where record_id = #{recordId,jdbcType=BIGINT}
+  </update>
+</mapper>

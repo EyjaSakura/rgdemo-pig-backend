@@ -11,7 +11,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
  */
 @EnablePigResourceServer
 @EnableDiscoveryClient
-@MapperScan("com.pig4cloud.pig.homework.mapper")
+@MapperScan({"com.pig4cloud.pig.homework.mapper", "com.pig4cloud.pig.admin.mapper"})
 @SpringBootApplication
 public class EyjaHomeworkApplication {
 	public static void main(String[] args) {

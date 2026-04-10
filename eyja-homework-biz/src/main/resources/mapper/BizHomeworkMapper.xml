@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pig4cloud.pig.homework.mapper.BizHomeworkMapper">
+
+    <resultMap id="HomeworkDetailMap" type="com.pig4cloud.pig.homework.vo.HomeworkDetailVO">
+        <result column="homework_id"        property="homeworkId"/>
+        <result column="teaching_id"        property="teachingId"/>
+        <result column="course_name"        property="courseName"/>
+        <result column="title"              property="title"/>
+        <result column="description"        property="description"/>
+        <result column="publish_time"       property="publishTime"/>
+        <result column="deadline"           property="deadline"/>
+        <result column="submission_id"      property="submissionId"/>
+        <result column="submission_status"  property="submissionStatus"/>
+        <result column="score"              property="score"/>
+        <result column="teacher_comment"    property="teacherComment"/>
+        <result column="submit_time"        property="submitTime"/>
+        <result column="submitted_count"    property="submittedCount"/>
+        <result column="pending_grade_count" property="pendingGradeCount"/>
+    </resultMap>
+
+    <!--
+        查询作业详情：
+        - 若传入 studentId，则附带该学生的提交状态
+        - 若 studentId 为 null，则附带教师视角的统计
+    -->
+    <select id="selectHomeworkDetail" resultMap="HomeworkDetailMap">
+        SELECT
+            h.homework_id, h.teaching_id,
+            c.course_name,
+            h.title, h.description,
+            h.publish_time, h.deadline,
+            <!-- 学生视角字段 -->
+            <if test="studentId != null">
+            s.submission_id,
+            s.status     AS submission_status,
+            s.score,
+            s.teacher_comment,
+            s.submit_time,
+            </if>
+            <!-- 教师/助教视角统计 -->
+            <if test="studentId == null">
+            COUNT(s.submission_id) AS submitted_count,
+            SUM(CASE WHEN s.status = '1' THEN 1 ELSE 0 END) AS pending_grade_count,
+            </if>
+            NULL AS dummy_end
+        FROM biz_homework h
+        LEFT JOIN biz_teaching  t ON t.teaching_id = h.teaching_id
+        LEFT JOIN biz_course    c ON c.course_code  = t.course_code
+        <if test="studentId != null">
+        LEFT JOIN biz_homework_submission s
+            ON s.homework_id = h.homework_id AND s.student_id = #{studentId} AND s.del_flag = '0'
+        </if>
+        <if test="studentId == null">
+        LEFT JOIN biz_homework_submission s
+            ON s.homework_id = h.homework_id AND s.del_flag = '0'
+        </if>
+        WHERE h.homework_id = #{homeworkId} AND h.del_flag = '0'
+        GROUP BY h.homework_id
+    </select>
+
+</mapper>

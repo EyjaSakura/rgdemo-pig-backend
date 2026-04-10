@@ -36,5 +36,16 @@ public class UserCenterVO {
 	@Schema(description = "学号/教职工号")
 	private String username;
 
+	/**
+	 * 用户类型（1管理员 2教师 3学生）
+	 */
+	@Schema(description = "用户类型：adm管理员 tch教师 stu学生，可扩展")
+	private String userType;
+
+	/**
+	 * 所属部门ID（学生→班级ID，教师→学院ID）
+	 */
+	@Schema(description = "所属部门ID")
+	private Long deptId;
 
 }
